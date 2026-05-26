@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 
 import HomePage      from '@/pages/HomePage'
 import LoginPage     from '@/pages/LoginPage'
+import ExplorePage   from '@/pages/ExplorePage'
 import DashboardHome from '@/pages/dashboard/DashboardHome'
 import AdminPage     from '@/pages/admin/AdminPage'
 
@@ -21,8 +22,9 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route path="/"      element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/"        element={<HomePage />} />
+          <Route path="/login"   element={<LoginPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
 
           {/* Protected dashboard */}
           <Route

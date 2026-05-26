@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import Nav from '@/components/layout/Nav'
 import Button from '@/components/ui/Button'
@@ -30,21 +30,24 @@ export default function HomePage() {
   const [pathway, setPathway]     = useState(DEFAULT_PATHWAY)
   const [articles, setArticles]   = useState([])
   const [courses, setCourses]     = useState([])
+  const [resources, setResources] = useState([])
   const [activeStep, setActiveStep] = useState(0)
   const marqueeRef = useRef(null)
 
   useEffect(() => {
     async function loadData() {
-      const [{ data: s }, { data: p }, { data: a }, { data: c }] = await Promise.all([
+      const [{ data: s }, { data: p }, { data: a }, { data: c }, { data: r }] = await Promise.all([
         supabase.from('site_settings').select('*').single(),
         supabase.from('pathway_config').select('*').order('step_number'),
         supabase.from('publications').select('tag,title,url').eq('active', true).order('sort_order'),
         supabase.from('courses').select('*').eq('active', true).order('sort_order'),
+        supabase.from('resources').select('*').eq('active', true).order('sort_order'),
       ])
       if (s) setSettings(s)
       if (p?.length) setPathway(p)
       if (a?.length) setArticles(a)
       if (c?.length) setCourses(c)
+      if (r?.length) setResources(r)
     }
     loadData()
   }, [])
@@ -247,6 +250,43 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── DROPS / RESOURCES ── */}
+      {resources.length > 0 && (
+        <section className={styles.secWhite}>
+          <div className={styles.secInner}>
+            <div className={styles.secHeaderRow}>
+              <div>
+                <div className={styles.secTag}>Field Notes</div>
+                <h2 className={styles.secH2}>Resources & teachings</h2>
+                <p className={styles.secSub}>One-off programs, tools, and drops from VOW Center.</p>
+              </div>
+              <Link to="/explore"><Button variant="outline" size="sm">See all →</Button></Link>
+            </div>
+            <div className={styles.dropsGrid}>
+              {resources.map(r => (
+                <div key={r.id} className={[styles.dropCard, r.featured ? styles.dropFeatured : ''].join(' ')}>
+                  {r.thumbnail_url
+                    ? <img src={r.thumbnail_url} alt={r.title} className={styles.dropThumb} />
+                    : <div className={styles.dropThumbPlaceholder}><span>📦</span></div>
+                  }
+                  <div className={styles.dropBody}>
+                    <div className={styles.dropCategory}>{r.category}</div>
+                    <div className={styles.dropTitle}>{r.title}</div>
+                    {r.subtitle && <div className={styles.dropSub}>{r.subtitle}</div>}
+                    <div className={styles.dropCta}>
+                      {r.resource_url
+                        ? <a href={r.resource_url} target="_blank" rel="noreferrer" className={styles.dropLink}>Access →</a>
+                        : <span className={styles.dropLink} style={{ color: 'var(--grey-mid)' }}>Coming soon</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── INSTRUCTOR TOOLS ── */}
       <section className={styles.secWhite}>
         <div className={styles.secInner}>
@@ -284,8 +324,6 @@ export default function HomePage() {
         </div>
         <span>© 2026 Verity Outreach Worship Center</span>
       </footer>
-
-      <button className={styles.fab} onClick={() => navigate('/login')}>📤 Share content</button>
     </div>
   )
 }

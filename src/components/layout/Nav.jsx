@@ -24,7 +24,7 @@ export default function Nav() {
 
         <div className={styles.links}>
           <Link to="/">Programs</Link>
-          <Link to="/">Resources</Link>
+          <Link to="/explore">Explore</Link>
           <Link to="/">About</Link>
         </div>
 

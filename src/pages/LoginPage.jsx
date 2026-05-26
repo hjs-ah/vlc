@@ -6,11 +6,10 @@ import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const [email, setEmail]     = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState(null)
-  const [sent, setSent]       = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -20,7 +19,12 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setError(error.message)
+      // Friendlier messages
+      if (error.message.includes('Invalid login')) {
+        setError('Email or password is incorrect. Contact your administrator if you need a reset.')
+      } else {
+        setError(error.message)
+      }
       setLoading(false)
     } else {
       navigate('/dashboard')
@@ -36,42 +40,41 @@ export default function LoginPage() {
         </div>
 
         <h1 className={styles.h1}>Sign in</h1>
-        <p className={styles.sub}>Access managed by VOW Center leadership.</p>
+        <p className={styles.sub}>Access is managed by VOW Center leadership.</p>
 
-        {sent ? (
-          <div className={styles.success}>
-            <div className={styles.successIcon}>📬</div>
-            <p>Check your email for a sign-in link.</p>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {error && <div className={styles.error}>{error}</div>}
+          <div className={styles.field}>
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@vowcenter.org"
+              required
+              autoFocus
+            />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className={styles.form}>
-            {error && <div className={styles.error}>{error}</div>}
-            <div className={styles.field}>
-              <label>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@vowcenter.org"
-                required
-                autoFocus
-              />
-            </div>
-            <div className={styles.field}>
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <Button type="submit" variant="ink" size="lg" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in →'}
-            </Button>
-          </form>
-        )}
+          <div className={styles.field}>
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <Button
+            type="submit"
+            variant="ink"
+            size="lg"
+            style={{ width: '100%', justifyContent: 'center' }}
+            disabled={loading}
+          >
+            {loading ? 'Signing in…' : 'Sign in →'}
+          </Button>
+        </form>
 
         <button className={styles.back} onClick={() => navigate('/')}>← Back to home</button>
       </div>
