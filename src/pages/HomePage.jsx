@@ -39,22 +39,36 @@ const DEFAULT_MARQUEE = {
   scripture_ref: '2 Timothy 2:15',
 }
 
-// Frame tints per step index
-const FRAME_BG = ['var(--grey-bg)', 'var(--blue-l)', '#F4F1E8', '#F8F0EB']
-const FRAME_BORDER = ['var(--grey-rule)', 'var(--blue-b)', '#E0D9C0', 'var(--orange-b)']
+// Per-step: frame tint, chip icon, chip accent color
+const STEP_META = [
+  { frameBg: 'var(--grey-bg)',  frameBorder: 'var(--grey-rule)', chipIcon: '🙏', chipBg: 'var(--grey-bg)',    accentColor: 'var(--grey-dark)' },
+  { frameBg: 'var(--blue-l)',   frameBorder: 'var(--blue-b)',    chipIcon: '📖', chipBg: 'var(--blue-l)',     accentColor: 'var(--blue)'      },
+  { frameBg: '#F4F1E8',         frameBorder: '#E0D9C0',           chipIcon: '🎓', chipBg: '#F4F1E8',           accentColor: '#8A7040'          },
+  { frameBg: 'var(--orange-l)', frameBorder: 'var(--orange-b)',  chipIcon: '⭐', chipBg: 'var(--orange-l)',   accentColor: 'var(--orange)'    },
+]
+
+// SVG chevron shapes — each step gets a different geometry
+// All rendered as inline SVG clip-path polygons via className
+const CHEVRON_SHAPES = [
+  'chevronClassic',   // standard right-pointing chevron
+  'chevronWide',      // wide flat chevron
+  'chevronSharp',     // sharp acute angle
+  'chevronNotched',   // notched arrow
+]
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const [settings,  setSettings]  = useState(DEFAULT_SETTINGS)
-  const [pathway,   setPathway]   = useState(DEFAULT_PATHWAY)
-  const [articles,  setArticles]  = useState(DEFAULT_ARTICLES)
-  const [courses,   setCourses]   = useState([])
-  const [resources, setResources] = useState([])
-  const [marquee,   setMarquee]   = useState(DEFAULT_MARQUEE)
+  const [settings,   setSettings]   = useState(DEFAULT_SETTINGS)
+  const [pathway,    setPathway]     = useState(DEFAULT_PATHWAY)
+  const [articles,   setArticles]   = useState(DEFAULT_ARTICLES)
+  const [courses,    setCourses]     = useState([])
+  const [resources,  setResources]  = useState([])
+  const [marquee,    setMarquee]    = useState(DEFAULT_MARQUEE)
   const [activeStep, setActiveStep] = useState(0)
   const marqueeTrackRef = useRef(null)
 
-  const step = pathway[activeStep] ?? DEFAULT_PATHWAY[0]
+  const step     = pathway[activeStep]     ?? DEFAULT_PATHWAY[0]
+  const stepMeta = STEP_META[activeStep % 4]
 
   useEffect(() => {
     async function load() {
@@ -76,55 +90,21 @@ export default function HomePage() {
     load()
   }, [])
 
-  // Double for seamless marquee loop
   const marqueeItems = [...articles, ...articles]
 
   return (
     <div className={styles.page}>
       <Nav />
 
-      {/* ── MARQUEE STRIP — top of page, below nav ── */}
-      <div className={styles.marqueeBar}>
-        <div
-          className={styles.marqueeLbl}
-          style={{ minWidth: 220 }}
-        >
-          <span className={styles.marqueeDot}>✦</span>
-          {settings.marquee_label}
-        </div>
-        <div
-          className={styles.marqueeViewport}
-          onMouseEnter={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','paused')}
-          onMouseLeave={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','running')}
-        >
-          <div className={styles.marqueeTrack} ref={marqueeTrackRef}>
-            {marqueeItems.map((a, i) => (
-              <a
-                key={i}
-                href={a.url ?? '#'}
-                target={a.url ? '_blank' : '_self'}
-                rel="noreferrer"
-                className={styles.marqueeItem}
-              >
-                <span className={styles.mTag}>{a.tag}</span>
-                <span className={styles.mTitle}>{a.title}</span>
-                <span className={styles.mArrow}>→</span>
-              </a>
-            ))}
-          </div>
-          {/* Fade masks */}
-          <div className={styles.fadeLeft}  />
-          <div className={styles.fadeRight} />
-        </div>
-      </div>
-
-      {/* ── HERO ── */}
+      {/* ════════════════════════════
+          HERO — tinted bg, chevron nav
+      ════════════════════════════ */}
       <section className={styles.hero}>
         <div className={styles.heroDots} />
 
         <div className={styles.heroInner}>
 
-          {/* LEFT — headline + CTA */}
+          {/* ── LEFT col ── */}
           <div className={styles.heroLeft}>
             <div className={styles.eyebrow}>
               <span className={styles.eyeDot} />
@@ -151,20 +131,37 @@ export default function HomePage() {
               </Button>
             </div>
             <p className={styles.heroNote}>Access is granted by VOW Center leadership.</p>
-
-            {/* Small logo mark below CTA */}
-            <img
-              src="/vlc-logo.jpg"
-              alt="Verity Learning Center"
-              className={styles.heroLogo}
-            />
           </div>
 
-          {/* RIGHT — rounded rect graphic frame + floating chips */}
+          {/* ── RIGHT col ── */}
           <div className={styles.heroRight}>
-            <div className={styles.graphicWrap}>
 
-              {/* Animated frames — one per pathway step */}
+            {/* Chevron path navigation — stacked vertically */}
+            <div className={styles.chevronNav}>
+              {pathway.map((s, i) => (
+                <button
+                  key={s.step_number}
+                  className={[
+                    styles.chevronItem,
+                    styles[CHEVRON_SHAPES[i % 4]],
+                    i === activeStep ? styles.chevronActive : '',
+                  ].join(' ')}
+                  onClick={() => setActiveStep(i)}
+                  style={{
+                    '--step-accent': STEP_META[i % 4].accentColor,
+                  }}
+                >
+                  <span className={styles.chevronNum}>{String(s.step_number).padStart(2,'0')}</span>
+                  <span className={styles.chevronName}>{s.name}</span>
+                  <span className={styles.chevronSub}>{s.sub_label}</span>
+                  {/* The chevron arrow pointer */}
+                  <span className={styles.chevronArrow} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+
+            {/* Graphic frame — changes per step */}
+            <div className={styles.graphicWrap}>
               {pathway.map((s, i) => (
                 <div
                   key={s.step_number}
@@ -172,8 +169,8 @@ export default function HomePage() {
                   style={{
                     background: s.image_url
                       ? `url(${s.image_url}) center/cover no-repeat`
-                      : FRAME_BG[i % 4],
-                    border: `1px solid ${FRAME_BORDER[i % 4]}`,
+                      : STEP_META[i % 4].frameBg,
+                    border: `1px solid ${STEP_META[i % 4].frameBorder}`,
                   }}
                 >
                   {!s.image_url && (
@@ -181,6 +178,16 @@ export default function HomePage() {
                       <span className={styles.frameEmoji}>{s.emoji}</span>
                       <span className={styles.frameLabel}>{s.name}</span>
                       <span className={styles.frameSub}>{s.description}</span>
+                      <span
+                        className={`badge ${
+                          i === 0 ? 'badge-grey' :
+                          i === 1 ? 'badge-blue' :
+                          i === 3 ? 'badge-orange' : 'badge-grey'
+                        }`}
+                        style={{ marginTop: 4 }}
+                      >
+                        {s.module_label}
+                      </span>
                     </>
                   )}
                   {settings.hero_fg_person_url && i === activeStep && (
@@ -189,51 +196,67 @@ export default function HomePage() {
                 </div>
               ))}
 
-              {/* Floating stat chips */}
-              <div className={`${styles.chip} ${styles.chip1}`}>
-                <div className={styles.chipIcon} style={{ background: 'var(--grey-bg)' }}>📚</div>
+              {/* Floating chips — content + icon changes per step */}
+              <div className={`${styles.chip} ${styles.chip1}`}
+                style={{ '--chip-bg': stepMeta.chipBg }}>
+                <div className={styles.chipIcon}>{stepMeta.chipIcon}</div>
                 <div>
                   <div className={styles.chipVal}>{settings.chip_1_value}</div>
                   <div className={styles.chipLbl}>{settings.chip_1_label}</div>
                 </div>
               </div>
-              <div className={`${styles.chip} ${styles.chip2}`}>
-                <div className={styles.chipIcon} style={{ background: 'var(--blue-l)' }}>👥</div>
+              <div className={`${styles.chip} ${styles.chip2}`}
+                style={{ '--chip-bg': 'var(--blue-l)' }}>
+                <div className={styles.chipIcon}>👥</div>
                 <div>
                   <div className={styles.chipVal}>{settings.chip_2_value}</div>
                   <div className={styles.chipLbl}>{settings.chip_2_label}</div>
                 </div>
               </div>
-              <div className={`${styles.chip} ${styles.chip3}`}>
-                <div className={styles.chipIcon} style={{ background: 'var(--orange-l)' }}>✅</div>
+              <div className={`${styles.chip} ${styles.chip3}`}
+                style={{ '--chip-bg': 'var(--orange-l)' }}>
+                <div className={styles.chipIcon}>✅</div>
                 <div>
                   <div className={styles.chipVal}>{settings.chip_3_value}</div>
                   <div className={styles.chipLbl}>{settings.chip_3_label}</div>
                 </div>
               </div>
-
             </div>
-          </div>
-        </div>
 
-        {/* ── PATHWAY STRIP — bottom of hero ── */}
-        <div className={styles.pathwayStrip}>
-          <div className={styles.pathwayInner}>
-            {pathway.map((s, i) => (
-              <button
-                key={s.step_number}
-                className={[styles.pathStep, i === activeStep ? styles.pathStepActive : ''].join(' ')}
-                onClick={() => setActiveStep(i)}
+          </div>{/* /heroRight */}
+        </div>{/* /heroInner */}
+      </section>
+
+      {/* ── MARQUEE BAR — grey background, white text, replaces pathway strip ── */}
+      <div className={styles.marqueeBar}>
+        <div className={styles.marqueeLbl}>
+          <span className={styles.marqueeDot}>✦</span>
+          {settings.marquee_label}
+        </div>
+        <div
+          className={styles.marqueeViewport}
+          onMouseEnter={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','paused')}
+          onMouseLeave={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','running')}
+        >
+          <div className={styles.fadeLeft}  />
+          <div className={styles.fadeRight} />
+          <div className={styles.marqueeTrack} ref={marqueeTrackRef}>
+            {marqueeItems.map((a, i) => (
+              <a
+                key={i}
+                href={a.url ?? '#'}
+                target={a.url ? '_blank' : '_self'}
+                rel="noreferrer"
+                className={styles.marqueeItem}
               >
-                <div className={styles.pathNum}>{s.step_number}</div>
-                <div className={styles.pathName}>{s.name}</div>
-                <div className={styles.pathSub}>{s.sub_label}</div>
-              </button>
+                <span className={styles.mTag}>{a.tag}</span>
+                <span className={styles.mTitle}>{a.title}</span>
+                <span className={styles.mArrow}>→</span>
+              </a>
             ))}
           </div>
         </div>
-
-      </section>
+      </div>
 
       {/* ── COURSES ── */}
       <div className={styles.secWhite}>
@@ -253,8 +276,7 @@ export default function HomePage() {
             }))).map(c => (
               <div key={c.id} className={styles.courseCard}>
                 <div className={styles.courseThumb}
-                  style={{ background: `linear-gradient(135deg, ${c.thumb_color_start}, ${c.thumb_color_end})` }}
-                >
+                  style={{ background: `linear-gradient(135deg, ${c.thumb_color_start}, ${c.thumb_color_end})` }}>
                   <span className={styles.courseBadge}>{c.badge_label}</span>
                 </div>
                 <div className={styles.courseBody}>
@@ -271,7 +293,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── FIELD NOTES / RESOURCES ── */}
+      {/* ── FIELD NOTES ── */}
       {resources.length > 0 && (
         <div className={styles.secGrey}>
           <div className={styles.secInner}>
@@ -341,7 +363,6 @@ export default function HomePage() {
       <footer className={styles.footer}>
         <div className={styles.footerLogo}>
           <img src="/vlc-logo.jpg" alt="Verity Learning Center" className={styles.footerLogoImg} />
-          <span>Verity Learning Center · VOW Center</span>
         </div>
         <span className={styles.footerCopy}>© 2026 Verity Outreach Worship Center</span>
       </footer>

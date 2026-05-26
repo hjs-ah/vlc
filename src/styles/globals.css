@@ -24,10 +24,12 @@ input, textarea, select { font-family: inherit; }
   --grey-dark: #444441;
   --ink: #1A1A1A;
 
-  --blue: #2E7FD4;
-  --blue-l: #EBF4FC;
-  --blue-b: #B5D4F4;
-  --blue-d: #1A5FA0;
+  --blue: #4A8BBF;
+  --blue-l: #EBF3FA;
+  --blue-b: #AAD0EA;
+  --blue-d: #2E6A96;
+
+  --hero-tint: #EEF4F8;
 
   --orange: #E06820;
   --orange-l: #FDF0E8;
