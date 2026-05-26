@@ -1,0 +1,101 @@
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+input, textarea, select { font-family: inherit; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+/* ── DESIGN TOKENS ── */
+:root {
+  --white: #FFFFFF;
+  --grey-bg: #F4F4F2;
+  --grey-rule: #E5E5E2;
+  --grey-mid: #CDCDC8;
+  --grey-text: #888884;
+  --grey-dark: #444441;
+  --ink: #1A1A1A;
+
+  --blue: #2E7FD4;
+  --blue-l: #EBF4FC;
+  --blue-b: #B5D4F4;
+  --blue-d: #1A5FA0;
+
+  --orange: #E06820;
+  --orange-l: #FDF0E8;
+  --orange-b: #F5C8A0;
+
+  --green: #3A9A5C;
+  --green-l: #E8F8EE;
+  --red: #C04040;
+  --red-l: #FEE8E8;
+
+  --sh-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --sh: 0 2px 12px rgba(0,0,0,0.08);
+  --sh-lg: 0 6px 28px rgba(0,0,0,0.1);
+  --r: 12px;
+  --rs: 7px;
+}
+
+/* ── SHARED UTILITY CLASSES ── */
+.card {
+  background: #fff;
+  border: 1px solid var(--grey-rule);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-blue   { background: var(--blue-l);   color: var(--blue-d); }
+.badge-orange { background: var(--orange-l); color: #994010; }
+.badge-green  { background: var(--green-l);  color: var(--green); }
+.badge-red    { background: var(--red-l);    color: var(--red); }
+.badge-grey   { background: var(--grey-bg);  color: var(--grey-dark); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 4px;
+  background: var(--grey-rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--blue);
+  transition: width 0.6s ease;
+}
+.progress-fill.green { background: var(--green); }
+
+/* ── MARQUEE ── */
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── FADE IN ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.2s ease; }
+
+/* ── CHIP FLOAT ── */
+@keyframes chipFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}

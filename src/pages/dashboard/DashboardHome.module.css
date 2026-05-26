@@ -1,0 +1,44 @@
+.page   { animation: fadeUp 0.2s ease; }
+.header { margin-bottom: 24px; }
+.header h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; }
+.header p  { font-size: 13.5px; color: var(--grey-dark); margin-top: 3px; }
+
+.statsRow { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; margin-bottom: 22px; }
+.stat { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); padding: 18px; position: relative; overflow: hidden; }
+.stat::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px; }
+.blue::after   { background: var(--blue); }
+.orange::after { background: var(--orange); }
+.mix::after    { background: linear-gradient(90deg, var(--blue), #85B7EB); }
+.statLabel { font-size: 11px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 8px; }
+.statVal   { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--ink); }
+.blue .statVal   { color: var(--blue); }
+.orange .statVal { color: var(--orange); }
+.statSub { font-size: 12px; color: var(--grey-text); margin-top: 4px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.cardHead { padding: 14px 18px; border-bottom: 1px solid var(--grey-rule); font-size: 14px; font-weight: 700; color: var(--ink); }
+
+.courseRow {
+  padding: 13px 18px; border-bottom: 1px solid var(--grey-bg);
+  display: flex; align-items: center; gap: 12px;
+  transition: background 0.15s; cursor: pointer;
+}
+.courseRow:last-child { border-bottom: none; }
+.courseRow:hover { background: var(--grey-bg); }
+.courseThumb { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
+.courseInfo  { flex: 1; min-width: 0; }
+.courseName  { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coursePct   { font-size: 12px; color: var(--blue); font-weight: 600; flex-shrink: 0; }
+
+.aRow { padding: 12px 18px; border-bottom: 1px solid var(--grey-bg); display: flex; align-items: center; gap: 12px; }
+.aRow:last-child { border-bottom: none; }
+.aDot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.aInfo { flex: 1; }
+.aTitle { font-size: 13px; font-weight: 600; color: var(--ink); }
+.aMeta  { font-size: 11.5px; color: var(--grey-text); margin-top: 1px; }
+
+.empty { padding: 24px 18px; font-size: 13.5px; color: var(--grey-text); text-align: center; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
