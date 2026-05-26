@@ -1,264 +1,304 @@
 .page { min-height: 100vh; }
 
-/* ══════════════════════════════════════════
-   HERO — layered overlapping boxes
-   Canvas is a fixed-height relative container.
-   Boxes are absolutely positioned within it,
-   with box2 (path detail) overlapping box1's
-   bottom-right corner via z-index.
-══════════════════════════════════════════ */
+/* ══ MARQUEE BAR — top strip below nav ══ */
+.marqueeBar {
+  height: 48px;
+  background: #fff;
+  border-bottom: 1px solid var(--grey-rule);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+  z-index: 90;
+}
+.marqueeLbl {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 0 48px;
+  border-right: 1px solid var(--grey-rule);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--grey-text);
+  white-space: nowrap;
+  background: #fff;
+  z-index: 2;
+}
+.marqueeDot { color: var(--orange); font-size: 12px; }
+.marqueeViewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.fadeLeft {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 60px;
+  background: linear-gradient(to right, #fff, transparent);
+  pointer-events: none; z-index: 2;
+}
+.fadeRight {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 60px;
+  background: linear-gradient(to left, #fff, transparent);
+  pointer-events: none; z-index: 2;
+}
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: marqueeScroll 42s linear infinite;
+}
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marqueeItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px;
+  height: 48px;
+  font-size: 13px;
+  color: var(--grey-dark);
+  text-decoration: none;
+  border-right: 1px solid var(--grey-rule);
+  transition: color 0.15s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.marqueeItem:hover { color: var(--ink); }
+.marqueeItem:hover .mTitle { color: var(--blue); }
+.mTag   { font-size: 9.5px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; color: var(--orange); flex-shrink: 0; }
+.mTitle { font-size: 13px; font-weight: 500; color: var(--grey-dark); transition: color 0.15s; }
+.mArrow { font-size: 11px; color: var(--grey-mid); flex-shrink: 0; }
+
+/* ══ HERO ══ */
 .hero {
   background: #fff;
-  padding-top: 60px;
+  padding-top: 0;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  min-height: calc(100vh - 108px); /* full viewport minus nav + marquee */
 }
-.heroDotGrid {
+.heroDots {
   position: absolute; inset: 0;
   background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
   background-size: 30px 30px;
   pointer-events: none; opacity: 0.5; z-index: 0;
 }
-
-/* ── CANVAS ── */
-.heroCanvas {
-  position: relative;
-  width: 100%;
-  /* Total height = enough for all 3 boxes + overlap room */
-  height: 660px;
-  max-width: 1400px;
+.heroInner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 60px 48px 40px;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  gap: 72px;
+  position: relative;
   z-index: 1;
 }
 
-/* ── BOX 1: top-left — headline/welcome ── */
-.box1 {
-  position: absolute;
-  top: 32px;
-  left: 48px;
-  width: 380px;
-  /* height is content-driven but min set so box2 can overlap nicely */
-  min-height: 320px;
-  background: var(--ink);
-  border-radius: 16px;
-  padding: 36px 32px;
-  z-index: 1;
+/* LEFT */
+.heroLeft {
+  flex: 1;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
 }
 .eyebrow {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--grey-dark);
+  margin-bottom: 18px;
 }
-.eyebrowDot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+.eyeDot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
 .h1 {
-  font-size: clamp(26px, 2.8vw, 36px);
-  font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
-  color: #fff;
+  font-size: clamp(34px, 4.5vw, 54px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  color: var(--ink);
+  margin-bottom: 18px;
 }
 .h1 em { font-style: italic; color: var(--blue); }
-.h1sub { font-size: 13px; line-height: 1.65; color: rgba(255,255,255,0.55); }
-.box1cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-
-/* ── PATH LIST: sits left of box2, mid-left ── */
-.pathList {
-  position: absolute;
-  /* Aligns with the left edge of the canvas, below box1 */
-  top: 390px;
-  left: 48px;
-  width: 170px;
-  display: flex;
-  flex-direction: column;
-  z-index: 3;
-}
-.pathItem {
-  padding: 12px 0;
-  cursor: pointer;
-  transition: all 0.18s;
-}
-.pathItem:last-child .pathRule { display: none; }
-.pathName {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
+.heroSub {
+  font-size: 16px;
+  line-height: 1.75;
   color: var(--grey-dark);
-  transition: color 0.18s, font-weight 0.18s;
-  line-height: 1.3;
-  text-align: right; /* right-align toward box2 */
+  max-width: 420px;
+  margin-bottom: 28px;
 }
-.pathItemActive .pathName {
-  color: var(--ink);
-  font-weight: 700;
+.heroCta  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.heroNote { font-size: 12px; color: var(--grey-text); margin-top: 10px; }
+.heroLogo {
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  margin-top: 28px;
+  opacity: 0.85;
 }
-.pathRule {
-  height: 1px;
-  background: var(--grey-rule);
-  margin-top: 12px;
-}
-.pathItemActive .pathRule { background: var(--ink); }
 
-/* ── BOX 2: bottom-center — path graphic + detail ── */
-.box2 {
-  position: absolute;
-  /* Overlaps the bottom-right of box1 */
-  top: 270px;
-  left: 230px;
-  width: 420px;
-  background: var(--ink);
-  border-radius: 16px;
-  overflow: hidden;
-  z-index: 2; /* sits above box1 */
-  display: flex;
-  flex-direction: column;
-}
-.box2graphic {
-  width: 100%;
-  height: 260px;
+/* RIGHT — graphic */
+.heroRight {
+  flex: 0 0 420px;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.graphicWrap {
+  width: 380px;
+  height: 380px;
   position: relative;
-  transition: background 0.4s ease;
+}
+
+/* Frames — stacked, only active visible */
+.frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
   overflow: hidden;
 }
-.box2emoji {
-  font-size: 80px;
-  user-select: none;
-  opacity: 0.35;
+.frameActive {
+  opacity: 1;
+  transform: translateY(0);
 }
-.box2fg {
-  position: absolute; bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  height: 95%; width: auto; object-fit: contain;
+.frameEmoji { font-size: 72px; line-height: 1; user-select: none; }
+.frameLabel { font-size: 14px; font-weight: 700; color: var(--grey-dark); text-align: center; letter-spacing: -0.2px; }
+.frameSub   { font-size: 12.5px; color: var(--grey-text); text-align: center; line-height: 1.5; max-width: 240px; }
+.frameFg {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  height: 90%; width: auto; object-fit: contain;
   pointer-events: none; z-index: 2;
 }
-.stepBadge {
-  position: absolute;
-  top: 14px; right: 14px;
-  font-size: 11px; font-weight: 700; letter-spacing: 1px;
-  color: rgba(255,255,255,0.35);
-  z-index: 3;
-}
-.box2detail {
-  padding: 20px 22px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-.detailName { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
-.detailDesc { font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.6; }
-.detailFooter {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 4px; flex-wrap: wrap; gap: 8px;
-}
-.detailMeta { font-size: 11px; font-weight: 600; color: var(--blue); letter-spacing: 0.2px; }
-.detailCta {
-  font-size: 12.5px; font-weight: 700;
-  color: rgba(255,255,255,0.8);
-  background: none; border: none; cursor: pointer;
-  font-family: inherit; padding: 0;
-  transition: color 0.15s;
-}
-.detailCta:hover { color: #fff; }
 
-/* ── BOX 3: top-right — article feed ── */
-.box3 {
+/* Floating chips */
+.chip {
   position: absolute;
-  top: 32px;
-  right: 48px;
-  width: 320px;
-  /* tall enough to show 4-5 articles */
-  min-height: 400px;
-  background: var(--ink);
-  border-radius: 16px;
-  padding: 26px 24px;
-  z-index: 1;
+  background: #fff;
+  border: 1px solid var(--grey-rule);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: var(--sh);
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+  animation: chipFloat 4s ease-in-out infinite;
 }
-.feedHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+.chip2 { animation-delay: 1.6s; }
+.chip3 { animation-delay: 0.9s; }
+@keyframes chipFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
 }
-.feedLabel {
-  font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
-  color: rgba(255,255,255,0.9);
-  font-style: italic; line-height: 1.4;
-}
-.feedLink {
-  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4);
-  text-decoration: none; white-space: nowrap; margin-top: 2px;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-.feedLink:hover { color: rgba(255,255,255,0.8); }
-.feedList { display: flex; flex-direction: column; gap: 0; flex: 1; }
-.feedItem {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  text-decoration: none;
-  display: flex; flex-direction: column; gap: 4px;
-  cursor: pointer; transition: opacity 0.15s;
-}
-.feedItem:last-child { border-bottom: none; }
-.feedItem:hover { opacity: 0.75; }
-.feedTag   { font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--orange); }
-.feedTitle { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.45; }
+.chip1 { top: -14px; right: 20px; }
+.chip2 { bottom: 20px; right: -20px; }
+.chip3 { top: 40%; left: -30px; }
+.chipIcon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.chipVal  { font-size: 17px; font-weight: 700; line-height: 1; color: var(--ink); }
+.chipLbl  { font-size: 11px; color: var(--grey-text); margin-top: 1px; }
 
-/* ── SPOTLIGHT STRIP ── */
-.spotlight {
+/* ══ PATHWAY STRIP ══ */
+.pathwayStrip {
+  background: #fff;
   border-top: 1px solid var(--grey-rule);
-  background: var(--ink);
-  position: relative; z-index: 2;
+  position: relative;
+  z-index: 1;
 }
-.spotlightInner {
-  max-width: 1400px; margin: 0 auto;
-  padding: 20px 48px;
-  display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+.pathwayInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  overflow-x: auto;
 }
-.spotlightLeft { flex-shrink: 0; }
-.spotlightLabel { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
-.spotlightTitle { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-.spotlightSub   { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-.spotlightScripture {
-  flex: 1; min-width: 200px;
-  border-left: 1px solid rgba(255,255,255,0.12);
-  padding-left: 28px;
+.pathStep {
+  flex: 1;
+  min-width: 130px;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-top: 2px solid transparent;
+  font-family: inherit;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
 }
-.scriptureText { font-size: 12px; font-style: italic; color: rgba(255,255,255,0.55); line-height: 1.65; }
-.scriptureRef  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); margin-top: 4px; display: block; }
-.spotlightBtn  { flex-shrink: 0; }
-/* Override button styles so it reads against dark bg */
-.spotlightBtn,
-.spotlightBtn:hover {
-  border-color: rgba(255,255,255,0.22) !important;
-  color: rgba(255,255,255,0.65) !important;
+.pathStep:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--grey-mid);
+  font-size: 13px;
+  pointer-events: none;
 }
-.spotlightBtn:hover {
-  border-color: rgba(255,255,255,0.55) !important;
-  color: #fff !important;
-  background: transparent !important;
+.pathStep:hover { background: var(--grey-bg); }
+.pathStepActive {
+  border-top-color: var(--blue);
+  background: var(--blue-l);
 }
+.pathNum {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--grey-bg);
+  color: var(--grey-text);
+  border: 1px solid var(--grey-rule);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.pathStepActive .pathNum { background: var(--blue); color: #fff; border-color: var(--blue); }
+.pathName { font-size: 12.5px; font-weight: 600; color: var(--grey-dark); line-height: 1.3; transition: color 0.2s; }
+.pathStepActive .pathName { color: var(--blue); }
+.pathSub  { font-size: 11px; color: var(--grey-text); }
+.pathStepActive .pathSub { color: var(--blue-d); }
 
-/* ══ SECTIONS BELOW HERO ══ */
+/* ══ SECTIONS ══ */
 .secWhite { background: #fff;           padding: 72px 0; }
 .secGrey  { background: var(--grey-bg); padding: 72px 0; }
 .secInner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-.secHeaderRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
-.secTag  { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
-.secH2   { font-size: clamp(22px, 2.8vw, 32px); font-weight: 700; letter-spacing: -1px; line-height: 1.2; color: var(--ink); }
-.secSub  { font-size: 15px; color: var(--grey-dark); margin-top: 8px; max-width: 440px; line-height: 1.65; }
+.secRow   { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
+.secTag   { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.secH2    { font-size: clamp(22px, 2.8vw, 32px); font-weight: 700; letter-spacing: -1px; line-height: 1.2; color: var(--ink); }
+.secSub   { font-size: 15px; color: var(--grey-dark); margin-top: 8px; max-width: 440px; line-height: 1.65; }
 
 /* Courses */
-.courseGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 20px; }
+.courseGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
 .courseCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; }
 .courseCard:hover { box-shadow: var(--sh); border-color: var(--grey-mid); }
 .courseThumb { height: 110px; display: flex; align-items: flex-end; padding: 12px; }
@@ -269,23 +309,23 @@
 .courseMeta  { display: flex; gap: 12px; font-size: 12px; color: var(--grey-mid); flex-wrap: wrap; }
 
 /* Drops */
-.dropsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 20px; }
-.dropCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; }
+.dropsGrid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.dropCard   { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; }
 .dropCard:hover { box-shadow: var(--sh); border-color: var(--grey-mid); }
 .dropFeatured { border-color: var(--blue-b); }
-.dropFeatured .dropCategory { color: var(--blue); }
-.dropThumb { width: 100%; height: 130px; object-fit: cover; }
-.dropThumbPlaceholder { width: 100%; height: 130px; background: var(--grey-bg); display: flex; align-items: center; justify-content: center; font-size: 36px; }
-.dropBody     { padding: 16px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
-.dropCategory { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--orange); }
-.dropTitle    { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
-.dropSub      { font-size: 12.5px; color: var(--grey-text); line-height: 1.4; }
-.dropCta      { margin-top: auto; padding-top: 10px; }
-.dropLink     { font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; }
+.dropFeatured .dropCat { color: var(--blue); }
+.dropThumb  { width: 100%; height: 130px; object-fit: cover; }
+.dropThumbPh { width: 100%; height: 130px; background: var(--grey-bg); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.dropBody   { padding: 16px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.dropCat    { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--orange); }
+.dropTitle  { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.dropSub    { font-size: 12.5px; color: var(--grey-text); line-height: 1.4; }
+.dropCta    { margin-top: auto; padding-top: 10px; }
+.dropLink   { font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; }
 .dropLink:hover { text-decoration: underline; }
 
 /* Tools */
-.toolGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; }
+.toolGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .toolCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); padding: 20px; display: flex; flex-direction: column; gap: 9px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
 .toolCard:hover { border-color: var(--blue-b); box-shadow: var(--sh-sm); }
 .toolIcon  { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -294,49 +334,35 @@
 .toolCta   { font-size: 12.5px; font-weight: 600; }
 
 /* Footer */
-.footer { background: var(--ink); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.footerLogo { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: rgba(255,255,255,0.5); }
-.footerMark { width: 26px; height: 26px; border-radius: 6px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: #fff; }
-.footer > span { font-size: 12px; color: rgba(255,255,255,0.3); }
+.footer {
+  background: var(--ink);
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footerLogo { display: flex; align-items: center; gap: 12px; }
+.footerLogoImg { height: 36px; width: auto; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; border-radius: 4px; }
+.footerLogo span { font-size: 12.5px; color: rgba(255,255,255,0.45); }
+.footerCopy { font-size: 12px; color: rgba(255,255,255,0.25); }
 
 /* ══ RESPONSIVE ══ */
-/* At tablet — collapse to stacked flow */
-@media (max-width: 960px) {
-  /* Switch canvas back to normal flow */
-  .heroCanvas {
-    position: relative;
-    height: auto;
-    padding: 20px 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .box1, .box2, .box3, .pathList {
-    position: relative;
-    top: auto; left: auto; right: auto; bottom: auto;
-    width: 100%;
-  }
-  .box1 { border-radius: 12px; }
-  .pathList {
-    display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px;
-    text-align: left;
-  }
-  .pathItem {
-    padding: 8px 14px; border: 1px solid var(--grey-rule);
-    border-radius: 20px; background: #fff;
-  }
-  .pathItemActive { background: var(--ink); border-color: var(--ink); }
-  .pathItemActive .pathName { color: #fff; }
-  .pathName { text-align: left; }
-  .pathRule { display: none; }
-  .box2 { width: 100%; }
-  .box3 { min-height: auto; }
-  .spotlightInner { padding: 16px 20px; flex-direction: column; gap: 14px; }
-  .spotlightScripture { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; }
+@media (max-width: 900px) {
+  .marqueeLbl { padding-left: 20px; min-width: 140px; font-size: 9.5px; }
+  .heroInner  { flex-direction: column; padding: 40px 20px 28px; gap: 36px; }
+  .heroRight  { width: 100%; max-width: 340px; align-self: center; }
+  .graphicWrap { width: 300px; height: 300px; }
+  .chip1 { top: -10px; right: 10px; }
+  .chip2 { bottom: 10px; right: -10px; }
+  .chip3 { top: 40%; left: -10px; }
+  .pathwayInner { padding: 0 20px; }
   .secInner { padding: 0 20px; }
   .footer   { padding: 24px 20px; }
 }
 @media (max-width: 600px) {
   .courseGrid, .dropsGrid { grid-template-columns: 1fr; }
   .toolGrid { grid-template-columns: 1fr 1fr; }
+  .pathStep:not(:last-child)::after { display: none; }
 }

@@ -29,6 +29,12 @@ export default function Nav() {
         </div>
 
         <div className={styles.actions}>
+          {/* Logo image — upper right */}
+          <img
+            src="/vlc-logo.jpg"
+            alt="Verity Learning Center"
+            className={styles.navLogo}
+          />
           {profile ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>

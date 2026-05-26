@@ -47,7 +47,15 @@
   transition: color 0.15s;
 }
 .links a:hover { color: var(--ink); }
-.actions { display: flex; gap: 10px; }
+.actions { display: flex; gap: 10px; align-items: center; }
+.navLogo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.9;
+  border-radius: 3px;
+  margin-right: 4px;
+}
 
 @media (max-width: 900px) {
   .inner  { padding: 0 20px; }
