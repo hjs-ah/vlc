@@ -77,14 +77,16 @@ export default function HomePage() {
       <Nav />
 
       {/* ══════════════════════════════
-          HERO — full-width 3-column
+          HERO — layered overlapping boxes
       ══════════════════════════════ */}
       <section className={styles.hero}>
         <div className={styles.heroDotGrid} />
 
-        {/* Welcome / headline strip */}
-        <div className={styles.heroTop}>
-          <div className={styles.heroTopInner}>
+        {/* Fixed-height canvas where boxes are absolutely placed */}
+        <div className={styles.heroCanvas}>
+
+          {/* BOX 1 — top-left: Welcome / headline */}
+          <div className={styles.box1}>
             <div className={styles.eyebrow}>
               <span className={styles.eyebrowDot} />
               VOW Center · Verity Outreach
@@ -96,14 +98,19 @@ export default function HomePage() {
                   : <span key={i}>{word} </span>
               )}
             </h1>
+            <p className={styles.h1sub}>{settings.hero_subtext}</p>
+            <div className={styles.box1cta}>
+              <Button variant="blue" size="sm" onClick={() => navigate('/login')}>
+                Start learning →
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/explore')}>
+                Explore
+              </Button>
+            </div>
           </div>
-        </div>
 
-        {/* 3-column grid */}
-        <div className={styles.heroGrid}>
-
-          {/* COL 1: Path list */}
-          <div className={styles.colPaths}>
+          {/* PATH LIST — left of box 2, floats mid-left */}
+          <div className={styles.pathList}>
             {pathway.map((s, i) => (
               <div
                 key={s.step_number}
@@ -118,62 +125,47 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* COL 2: Graphic — path image + detail box */}
-          <div className={styles.colGraphic}>
-            <div className={styles.graphicWrap}>
-              {/* Background / image area */}
-              <div
-                className={styles.graphicBg}
-                style={{
-                  background: step.image_url
-                    ? `url(${step.image_url}) center/cover no-repeat`
-                    : ['#F4F4F2','#EBF4FC','#F4F1E8','#F8F0EB'][displayStep % 4],
-                }}
-              >
-                {!step.image_url && (
-                  <span className={styles.graphicEmoji}>{step.emoji}</span>
-                )}
-                {settings.hero_fg_person_url && (
-                  <img
-                    src={settings.hero_fg_person_url}
-                    alt=""
-                    className={styles.graphicFg}
-                  />
-                )}
+          {/* BOX 2 — bottom-center: Path graphic + detail, overlaps box 1 */}
+          <div className={styles.box2}>
+            {/* Image / graphic fill */}
+            <div
+              className={styles.box2graphic}
+              style={{
+                background: step.image_url
+                  ? `url(${step.image_url}) center/cover no-repeat`
+                  : ['#1a1a1a','#0f1f35','#151c0f','#1c100a'][displayStep % 4],
+              }}
+            >
+              {!step.image_url && (
+                <span className={styles.box2emoji}>{step.emoji}</span>
+              )}
+              {settings.hero_fg_person_url && (
+                <img src={settings.hero_fg_person_url} alt="" className={styles.box2fg} />
+              )}
+              {/* Step counter badge */}
+              <div className={styles.stepBadge}>
+                {String(displayStep + 1).padStart(2,'0')} / {String(pathway.length).padStart(2,'0')}
               </div>
-
-              {/* Floating detail box — overlaps bottom of image */}
-              <div className={styles.detailBox}>
-                <div className={styles.detailStep}>Step {displayStep + 1} of {pathway.length}</div>
-                <div className={styles.detailTitle}>{step.name}</div>
-                <div className={styles.detailDesc}>{step.description}</div>
-                {step.module_label && (
-                  <div className={styles.detailMeta}>{step.module_label}</div>
-                )}
-                <div className={styles.detailActions}>
-                  <Button
-                    variant="ink"
-                    size="sm"
-                    onClick={() => navigate('/login')}
-                  >
-                    {step.cta_label ?? 'Learn more'} →
-                  </Button>
-                </div>
+            </div>
+            {/* Detail strip inside box 2 */}
+            <div className={styles.box2detail}>
+              <div className={styles.detailName}>{step.name}</div>
+              <div className={styles.detailDesc}>{step.description}</div>
+              <div className={styles.detailFooter}>
+                {step.module_label && <span className={styles.detailMeta}>{step.module_label}</span>}
+                <button className={styles.detailCta} onClick={() => navigate('/login')}>
+                  {step.cta_label ?? 'Learn more'} →
+                </button>
               </div>
             </div>
           </div>
 
-          {/* COL 3: Article / publication feed */}
-          <div className={styles.colFeed}>
+          {/* BOX 3 — top-right: Article / publication feed */}
+          <div className={styles.box3}>
             <div className={styles.feedHeader}>
-              <span className={styles.feedLabel}>From Verity</span>
-              <a
-                href="https://medium.com"
-                target="_blank"
-                rel="noreferrer"
-                className={styles.feedLink}
-              >
-                medium.com →
+              <span className={styles.feedLabel}>Article or publication<br/>feed from medium.com</span>
+              <a href="https://medium.com" target="_blank" rel="noreferrer" className={styles.feedLink}>
+                View all →
               </a>
             </div>
             <div className={styles.feedList}>
@@ -192,7 +184,7 @@ export default function HomePage() {
             </div>
           </div>
 
-        </div>{/* /heroGrid */}
+        </div>{/* /heroCanvas */}
 
         {/* ── DISCIPLESHIP MODULE SPOTLIGHT STRIP ── */}
         <div className={styles.spotlight}>
@@ -200,9 +192,7 @@ export default function HomePage() {
             <div className={styles.spotlightLeft}>
               <div className={styles.spotlightLabel}>{marquee.label}</div>
               <div className={styles.spotlightTitle}>{marquee.title}</div>
-              {marquee.subtitle && (
-                <div className={styles.spotlightSub}>{marquee.subtitle}</div>
-              )}
+              {marquee.subtitle && <div className={styles.spotlightSub}>{marquee.subtitle}</div>}
             </div>
             {(marquee.scripture_text || marquee.scripture_ref) && (
               <div className={styles.spotlightScripture}>
@@ -214,12 +204,7 @@ export default function HomePage() {
                 )}
               </div>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              className={styles.spotlightBtn}
-              onClick={() => navigate('/login')}
-            >
+            <Button variant="outline" size="sm" className={styles.spotlightBtn} onClick={() => navigate('/login')}>
               View module →
             </Button>
           </div>

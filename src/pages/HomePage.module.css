@@ -1,6 +1,12 @@
 .page { min-height: 100vh; }
 
-/* ══ HERO ══ */
+/* ══════════════════════════════════════════
+   HERO — layered overlapping boxes
+   Canvas is a fixed-height relative container.
+   Boxes are absolutely positioned within it,
+   with box2 (path detail) overlapping box1's
+   bottom-right corner via z-index.
+══════════════════════════════════════════ */
 .hero {
   background: #fff;
   padding-top: 60px;
@@ -8,67 +14,81 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid var(--grey-rule);
 }
 .heroDotGrid {
   position: absolute; inset: 0;
   background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
   background-size: 30px 30px;
-  pointer-events: none; opacity: 0.55; z-index: 0;
+  pointer-events: none; opacity: 0.5; z-index: 0;
 }
 
-/* Headline strip */
-.heroTop {
-  position: relative; z-index: 1;
-  padding: 48px 48px 0;
-  max-width: 1400px; margin: 0 auto; width: 100%;
+/* ── CANVAS ── */
+.heroCanvas {
+  position: relative;
+  width: 100%;
+  /* Total height = enough for all 3 boxes + overlap room */
+  height: 660px;
+  max-width: 1400px;
+  margin: 0 auto;
+  z-index: 1;
 }
-.heroTopInner { max-width: 680px; }
+
+/* ── BOX 1: top-left — headline/welcome ── */
+.box1 {
+  position: absolute;
+  top: 32px;
+  left: 48px;
+  width: 380px;
+  /* height is content-driven but min set so box2 can overlap nicely */
+  min-height: 320px;
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 36px 32px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 .eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  color: var(--grey-dark); margin-bottom: 14px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
 }
 .eyebrowDot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
 .h1 {
-  font-size: clamp(30px, 3.8vw, 50px);
-  font-weight: 800; line-height: 1.08; letter-spacing: -2px; color: var(--ink);
+  font-size: clamp(26px, 2.8vw, 36px);
+  font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
+  color: #fff;
 }
 .h1 em { font-style: italic; color: var(--blue); }
+.h1sub { font-size: 13px; line-height: 1.65; color: rgba(255,255,255,0.55); }
+.box1cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 
-/* ── 3-COLUMN GRID ── */
-.heroGrid {
-  display: grid;
-  grid-template-columns: 200px 1fr 280px;
-  gap: 0;
-  max-width: 1400px; margin: 0 auto; width: 100%;
-  padding: 32px 48px 0;
-  position: relative; z-index: 1;
-  min-height: 440px;
-  align-items: start;
-}
-
-/* COL 1 — Path list */
-.colPaths {
+/* ── PATH LIST: sits left of box2, mid-left ── */
+.pathList {
+  position: absolute;
+  /* Aligns with the left edge of the canvas, below box1 */
+  top: 390px;
+  left: 48px;
+  width: 170px;
   display: flex;
   flex-direction: column;
-  padding-top: 8px;
-  padding-right: 24px;
+  z-index: 3;
 }
 .pathItem {
-  padding: 14px 0;
+  padding: 12px 0;
   cursor: pointer;
   transition: all 0.18s;
-  position: relative;
 }
 .pathItem:last-child .pathRule { display: none; }
 .pathName {
   display: block;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--grey-dark);
   transition: color 0.18s, font-weight 0.18s;
   line-height: 1.3;
+  text-align: right; /* right-align toward box2 */
 }
 .pathItemActive .pathName {
   color: var(--ink);
@@ -77,137 +97,171 @@
 .pathRule {
   height: 1px;
   background: var(--grey-rule);
-  margin-top: 14px;
-  transition: background 0.18s;
+  margin-top: 12px;
 }
-.pathItemActive .pathRule { background: var(--blue); }
+.pathItemActive .pathRule { background: var(--ink); }
 
-/* COL 2 — Graphic */
-.colGraphic {
-  padding: 0 20px;
-}
-.graphicWrap {
-  position: relative;
-}
-.graphicBg {
-  width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: 16px 16px 0 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.35s ease;
+/* ── BOX 2: bottom-center — path graphic + detail ── */
+.box2 {
+  position: absolute;
+  /* Overlaps the bottom-right of box1 */
+  top: 270px;
+  left: 230px;
+  width: 420px;
+  background: var(--ink);
+  border-radius: 16px;
   overflow: hidden;
+  z-index: 2; /* sits above box1 */
+  display: flex;
+  flex-direction: column;
+}
+.box2graphic {
+  width: 100%;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
+  transition: background 0.4s ease;
+  overflow: hidden;
 }
-.graphicEmoji {
-  font-size: 72px;
+.box2emoji {
+  font-size: 80px;
   user-select: none;
+  opacity: 0.35;
 }
-.graphicFg {
+.box2fg {
   position: absolute; bottom: 0; left: 50%;
   transform: translateX(-50%);
-  height: 90%; width: auto; object-fit: contain;
+  height: 95%; width: auto; object-fit: contain;
   pointer-events: none; z-index: 2;
 }
-/* Detail box — floats over bottom of image into white */
-.detailBox {
-  background: #fff;
-  border: 1px solid var(--grey-rule);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.stepBadge {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: rgba(255,255,255,0.35);
+  z-index: 3;
 }
-.detailStep { font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text); }
-.detailTitle { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: -0.4px; }
-.detailDesc  { font-size: 13px; color: var(--grey-dark); line-height: 1.6; }
-.detailMeta  { font-size: 11.5px; color: var(--blue); font-weight: 600; margin-top: 2px; }
-.detailActions { margin-top: 8px; }
-
-/* COL 3 — Feed */
-.colFeed {
-  border-left: 1px solid var(--grey-rule);
-  padding-left: 24px;
-  padding-top: 8px;
+.box2detail {
+  padding: 20px 22px 22px;
   display: flex;
   flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.detailName { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
+.detailDesc { font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+.detailFooter {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 4px; flex-wrap: wrap; gap: 8px;
+}
+.detailMeta { font-size: 11px; font-weight: 600; color: var(--blue); letter-spacing: 0.2px; }
+.detailCta {
+  font-size: 12.5px; font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; padding: 0;
+  transition: color 0.15s;
+}
+.detailCta:hover { color: #fff; }
+
+/* ── BOX 3: top-right — article feed ── */
+.box3 {
+  position: absolute;
+  top: 32px;
+  right: 48px;
+  width: 320px;
+  /* tall enough to show 4-5 articles */
+  min-height: 400px;
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 26px 24px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .feedHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 16px;
+  gap: 12px;
 }
-.feedLabel { font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text); }
-.feedLink  { font-size: 11.5px; font-weight: 600; color: var(--blue); text-decoration: none; }
-.feedLink:hover { text-decoration: underline; }
-.feedList  { display: flex; flex-direction: column; gap: 0; }
-.feedItem  {
-  padding: 13px 0;
-  border-bottom: 1px solid var(--grey-rule);
+.feedLabel {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
+  color: rgba(255,255,255,0.9);
+  font-style: italic; line-height: 1.4;
+}
+.feedLink {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4);
+  text-decoration: none; white-space: nowrap; margin-top: 2px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.feedLink:hover { color: rgba(255,255,255,0.8); }
+.feedList { display: flex; flex-direction: column; gap: 0; flex: 1; }
+.feedItem {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   text-decoration: none;
   display: flex; flex-direction: column; gap: 4px;
-  transition: background 0.15s;
-  cursor: pointer;
+  cursor: pointer; transition: opacity 0.15s;
 }
 .feedItem:last-child { border-bottom: none; }
-.feedItem:hover .feedTitle { color: var(--blue); }
-.feedTag   { font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--orange); }
-.feedTitle { font-size: 13px; font-weight: 500; color: var(--grey-dark); line-height: 1.4; transition: color 0.15s; }
+.feedItem:hover { opacity: 0.75; }
+.feedTag   { font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--orange); }
+.feedTitle { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.45; }
 
-/* ── DISCIPLESHIP MODULE SPOTLIGHT STRIP ── */
+/* ── SPOTLIGHT STRIP ── */
 .spotlight {
-  margin-top: 0;
   border-top: 1px solid var(--grey-rule);
   background: var(--ink);
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
 }
 .spotlightInner {
   max-width: 1400px; margin: 0 auto;
   padding: 20px 48px;
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
 }
 .spotlightLeft { flex-shrink: 0; }
-.spotlightLabel {
-  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-  color: rgba(255,255,255,0.45); margin-bottom: 4px;
-}
-.spotlightTitle { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-.spotlightSub   { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.spotlightLabel { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.spotlightTitle { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+.spotlightSub   { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .spotlightScripture {
   flex: 1; min-width: 200px;
-  border-left: 1px solid rgba(255,255,255,0.15);
+  border-left: 1px solid rgba(255,255,255,0.12);
   padding-left: 28px;
 }
-.scriptureText { font-size: 12px; font-style: italic; color: rgba(255,255,255,0.6); line-height: 1.65; }
-.scriptureRef  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); margin-top: 4px; display: block; }
-.spotlightBtn  { flex-shrink: 0; border-color: rgba(255,255,255,0.25) !important; color: rgba(255,255,255,0.7) !important; }
-.spotlightBtn:hover { border-color: rgba(255,255,255,0.6) !important; color: #fff !important; }
+.scriptureText { font-size: 12px; font-style: italic; color: rgba(255,255,255,0.55); line-height: 1.65; }
+.scriptureRef  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); margin-top: 4px; display: block; }
+.spotlightBtn  { flex-shrink: 0; }
+/* Override button styles so it reads against dark bg */
+.spotlightBtn,
+.spotlightBtn:hover {
+  border-color: rgba(255,255,255,0.22) !important;
+  color: rgba(255,255,255,0.65) !important;
+}
+.spotlightBtn:hover {
+  border-color: rgba(255,255,255,0.55) !important;
+  color: #fff !important;
+  background: transparent !important;
+}
 
-/* ══ SECTIONS ══ */
+/* ══ SECTIONS BELOW HERO ══ */
 .secWhite { background: #fff;           padding: 72px 0; }
 .secGrey  { background: var(--grey-bg); padding: 72px 0; }
 .secInner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-.secHeaderRow {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 20px; flex-wrap: wrap; margin-bottom: 36px;
-}
+.secHeaderRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
 .secTag  { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
 .secH2   { font-size: clamp(22px, 2.8vw, 32px); font-weight: 700; letter-spacing: -1px; line-height: 1.2; color: var(--ink); }
 .secSub  { font-size: 15px; color: var(--grey-dark); margin-top: 8px; max-width: 440px; line-height: 1.65; }
 
 /* Courses */
-.courseGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-.courseCard {
-  background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r);
-  overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s;
-}
+.courseGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 20px; }
+.courseCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; }
 .courseCard:hover { box-shadow: var(--sh); border-color: var(--grey-mid); }
-.courseThumb { height: 110px; display: flex; align-items: flex-end; padding: 12px; position: relative; }
+.courseThumb { height: 110px; display: flex; align-items: flex-end; padding: 12px; }
 .courseBadge { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; background: rgba(255,255,255,0.9); padding: 3px 9px; border-radius: 20px; color: var(--ink); }
 .courseBody  { padding: 16px; }
 .courseTitle { font-size: 14.5px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; color: var(--ink); }
@@ -215,7 +269,7 @@
 .courseMeta  { display: flex; gap: 12px; font-size: 12px; color: var(--grey-mid); flex-wrap: wrap; }
 
 /* Drops */
-.dropsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.dropsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 20px; }
 .dropCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; }
 .dropCard:hover { box-shadow: var(--sh); border-color: var(--grey-mid); }
 .dropFeatured { border-color: var(--blue-b); }
@@ -231,7 +285,7 @@
 .dropLink:hover { text-decoration: underline; }
 
 /* Tools */
-.toolGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.toolGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; }
 .toolCard { background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r); padding: 20px; display: flex; flex-direction: column; gap: 9px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
 .toolCard:hover { border-color: var(--blue-b); box-shadow: var(--sh-sm); }
 .toolIcon  { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -246,29 +300,39 @@
 .footer > span { font-size: 12px; color: rgba(255,255,255,0.3); }
 
 /* ══ RESPONSIVE ══ */
-@media (max-width: 1100px) {
-  .heroGrid { grid-template-columns: 160px 1fr 240px; gap: 0; padding: 28px 32px 0; }
-  .heroTop  { padding: 40px 32px 0; }
-  .spotlightInner { padding: 18px 32px; }
-}
-@media (max-width: 860px) {
-  .heroGrid {
-    grid-template-columns: 1fr;
-    padding: 24px 20px 0;
+/* At tablet — collapse to stacked flow */
+@media (max-width: 960px) {
+  /* Switch canvas back to normal flow */
+  .heroCanvas {
+    position: relative;
+    height: auto;
+    padding: 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
-  .heroTop { padding: 36px 20px 0; }
-  .colPaths {
-    flex-direction: row; flex-wrap: wrap; gap: 8px;
-    padding-right: 0; padding-bottom: 20px;
-    border-bottom: 1px solid var(--grey-rule);
+  .box1, .box2, .box3, .pathList {
+    position: relative;
+    top: auto; left: auto; right: auto; bottom: auto;
+    width: 100%;
   }
-  .pathItem { padding: 8px 14px; border: 1px solid var(--grey-rule); border-radius: 20px; }
-  .pathItemActive { background: var(--ink); }
+  .box1 { border-radius: 12px; }
+  .pathList {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px;
+    text-align: left;
+  }
+  .pathItem {
+    padding: 8px 14px; border: 1px solid var(--grey-rule);
+    border-radius: 20px; background: #fff;
+  }
+  .pathItemActive { background: var(--ink); border-color: var(--ink); }
   .pathItemActive .pathName { color: #fff; }
+  .pathName { text-align: left; }
   .pathRule { display: none; }
-  .colFeed { border-left: none; border-top: 1px solid var(--grey-rule); padding-left: 0; padding-top: 20px; margin-top: 24px; }
-  .spotlightInner { padding: 16px 20px; flex-direction: column; gap: 16px; }
-  .spotlightScripture { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; }
+  .box2 { width: 100%; }
+  .box3 { min-height: auto; }
+  .spotlightInner { padding: 16px 20px; flex-direction: column; gap: 14px; }
+  .spotlightScripture { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; }
   .secInner { padding: 0 20px; }
   .footer   { padding: 24px 20px; }
 }
