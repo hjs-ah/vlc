@@ -8,63 +8,121 @@ import styles from './HomePage.module.css'
 const DEFAULT_SETTINGS = {
   hero_headline: 'Learning that forms the whole person',
   hero_subtext: 'A curated learning environment for new members, discipleship, and deeper biblical formation — designed for the community, accessible to all.',
-  hero_bg_photo_url: null,
-  hero_fg_person_url: null,
-  chip_1_value: '4',    chip_1_label: 'Active Programs',
+  hero_bg_photo_url: null, hero_fg_person_url: null,
+  chip_1_value: '4', chip_1_label: 'Active Programs',
   chip_2_value: '120+', chip_2_label: 'Members Enrolled',
-  chip_3_value: '68%',  chip_3_label: 'Avg Completion',
+  chip_3_value: '68%', chip_3_label: 'Avg Completion',
   marquee_label: 'From the Director of Education',
 }
 
 const DEFAULT_PATHWAY = [
-  { step_number: 1, name: 'New Members',          sub_label: 'Foundations of faith',  emoji: '🙏', description: 'Lay the foundation. Understand who VOW is, what we believe, and how you belong.', module_label: 'Foundation · 6 modules · 6 weeks', image_url: null },
-  { step_number: 2, name: 'Discipleship',          sub_label: 'Module 4 of 8',          emoji: '📖', description: 'Go deeper. Practical formation in scripture, prayer, service, and community life.',  module_label: 'Formation · 8 modules · 10 weeks', image_url: null },
-  { step_number: 3, name: 'Truth Bible Institute', sub_label: 'Begins Fall 2026',       emoji: '🎓', description: 'Rigorous biblical study for those called to lead, teach, and serve with depth.',      module_label: 'Study · 12 modules · Fall 2026',   image_url: null },
-  { step_number: 4, name: 'Advanced',              sub_label: 'Leadership track',       emoji: '⭐', description: 'Leadership formation, ministry practicum, and specialized study for emerging leaders.', module_label: 'Leadership · By invitation',      image_url: null },
+  { step_number:1, name:'New Members',          sub_label:'Foundations of faith', emoji:'🙏', description:'Lay the foundation. Understand who VOW is, what we believe, and how you belong.',            module_label:'Foundation · 6 modules · 6 weeks',    image_url:null },
+  { step_number:2, name:'Discipleship',          sub_label:'Module 4 of 8',        emoji:'📖', description:'Go deeper. Practical formation in scripture, prayer, service, and community life.',          module_label:'Formation · 8 modules · 10 weeks',    image_url:null },
+  { step_number:3, name:'Truth Bible Institute', sub_label:'Begins Fall 2026',     emoji:'🎓', description:'Rigorous biblical study for those called to lead, teach, and serve with depth.',            module_label:'Study · 12 modules · Fall 2026',      image_url:null },
+  { step_number:4, name:'Advanced',              sub_label:'Leadership track',     emoji:'⭐', description:'Leadership formation, ministry practicum, and specialized study for emerging leaders.',      module_label:'Leadership · By invitation',          image_url:null },
 ]
 
 const DEFAULT_ARTICLES = [
-  { tag: 'Formation', title: 'The Shepherd as Activist: Prophetic Ministry in the Urban Context',   url: null },
-  { tag: 'Theology',  title: 'First Fruits, Feast Days, and the Theology of Giving',                 url: null },
-  { tag: 'Community', title: 'Chess, Not Checkers: Why We Invest in the Long Game of Mentorship',    url: null },
-  { tag: 'Formation', title: 'Incarnational Ministry and the Work of Presence',                       url: null },
-  { tag: 'Theology',  title: 'Stewardship, Ownership, and What the Torah Says About Wealth',          url: null },
+  { tag:'Formation', title:'The Shepherd as Activist: Prophetic Ministry in the Urban Context',  url:null },
+  { tag:'Theology',  title:'First Fruits, Feast Days, and the Theology of Giving',                url:null },
+  { tag:'Community', title:'Chess, Not Checkers: Why We Invest in the Long Game of Mentorship',   url:null },
+  { tag:'Formation', title:'Incarnational Ministry and the Work of Presence',                      url:null },
+  { tag:'Theology',  title:'Stewardship, Ownership, and What the Torah Says About Wealth',         url:null },
 ]
 
 const DEFAULT_MARQUEE = {
-  label: "This Month's Discipleship Module",
-  title: 'The Theology of Presence',
-  subtitle: 'Module 4 of 8 — Discipleship Class',
-  scripture_text: 'Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth.',
-  scripture_ref: '2 Timothy 2:15',
+  label:"This Month's Discipleship Module",
+  title:'The Theology of Presence',
+  subtitle:'Module 4 of 8 — Discipleship Class',
+  scripture_text:'Study to shew thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth.',
+  scripture_ref:'2 Timothy 2:15',
 }
 
-// Per-step: frame tint, chip icon, chip accent color
+// Chips: unique content + position per step — no fixed chip1/chip2/chip3 classes
 const STEP_META = [
-  { frameBg: 'var(--grey-bg)',  frameBorder: 'var(--grey-rule)', chipIcon: '🙏', chipBg: 'var(--grey-bg)',    accentColor: 'var(--grey-dark)' },
-  { frameBg: 'var(--blue-l)',   frameBorder: 'var(--blue-b)',    chipIcon: '📖', chipBg: 'var(--blue-l)',     accentColor: 'var(--blue)'      },
-  { frameBg: '#F4F1E8',         frameBorder: '#E0D9C0',           chipIcon: '🎓', chipBg: '#F4F1E8',           accentColor: '#8A7040'          },
-  { frameBg: 'var(--orange-l)', frameBorder: 'var(--orange-b)',  chipIcon: '⭐', chipBg: 'var(--orange-l)',   accentColor: 'var(--orange)'    },
+  {
+    frameBg:'var(--grey-bg)', accentColor:'var(--grey-dark)',
+    chips:[
+      { icon:'🙏', val:'6',    lbl:'Modules',        style:{ top:'-14px',  right:'10px'  }, bg:'var(--grey-bg)',   delay:'0s'   },
+      { icon:'📅', val:'6wk',  lbl:'Duration',        style:{ bottom:'20px',right:'-18px' }, bg:'var(--orange-l)', delay:'1.6s' },
+      { icon:'👥', val:'Open', lbl:'Enrollment',      style:{ top:'38%',   left:'-22px'  }, bg:'var(--blue-l)',   delay:'0.9s' },
+    ],
+  },
+  {
+    frameBg:'var(--blue-l)', accentColor:'var(--blue)',
+    chips:[
+      { icon:'📖', val:'8',    lbl:'Modules',         style:{ top:'-14px',  left:'20px'   }, bg:'var(--blue-l)',   delay:'0s'   },
+      { icon:'⏱',  val:'10wk', lbl:'Course length',   style:{ bottom:'10px',right:'-18px' }, bg:'var(--grey-bg)', delay:'1.4s' },
+      { icon:'✅',  val:'52%',  lbl:'Your progress',   style:{ top:'30%',   left:'-28px'  }, bg:'var(--blue-l)',   delay:'0.7s' },
+    ],
+  },
+  {
+    frameBg:'#F4F1E8', accentColor:'#8A7040',
+    chips:[
+      { icon:'🎓', val:'12',   lbl:'Modules',         style:{ top:'-14px',  right:'30px'  }, bg:'#F4F1E8',         delay:'0s'   },
+      { icon:'📆', val:'Fall', lbl:'2026 cohort',     style:{ bottom:'24px',left:'-22px'  }, bg:'var(--orange-l)', delay:'1.8s' },
+      { icon:'🏛️', val:'TBI',  lbl:'Institute',       style:{ top:'45%',   right:'-20px' }, bg:'#F4F1E8',         delay:'1.1s' },
+    ],
+  },
+  {
+    frameBg:'var(--orange-l)', accentColor:'var(--orange)',
+    chips:[
+      { icon:'⭐', val:'∞',    lbl:'Always learning', style:{ top:'-10px',  left:'14px'   }, bg:'var(--orange-l)', delay:'0s'   },
+      { icon:'🎯', val:'Lead', lbl:'Track',           style:{ bottom:'16px',right:'-20px' }, bg:'var(--grey-bg)', delay:'2s'   },
+      { icon:'🔑', val:'Inv.', lbl:'By invitation',   style:{ top:'50%',   left:'-26px'  }, bg:'var(--blue-l)',   delay:'0.6s' },
+    ],
+  },
 ]
 
-// SVG chevron shapes — each step gets a different geometry
-// All rendered as inline SVG clip-path polygons via className
-const CHEVRON_SHAPES = [
-  'chevronClassic',   // standard right-pointing chevron
-  'chevronWide',      // wide flat chevron
-  'chevronSharp',     // sharp acute angle
-  'chevronNotched',   // notched arrow
+const CHEVRON_SHAPES = ['chevronClassic','chevronWide','chevronSharp','chevronNotched']
+
+// Carousel slides
+const CAROUSEL_SLIDES = [
+  {
+    id: 'welcome',
+    tag: 'Welcome',
+    title: 'Welcome to Verity Learning Center',
+    desc: 'A brief introduction to who we are, what we believe, and how this platform supports your formation journey at VOW Center.',
+    cta: 'Watch intro',
+    ctaIcon: '▶',
+    bg: 'var(--ink)',
+    light: true,
+    type: 'video',
+  },
+  {
+    id: 'signup',
+    tag: 'Get Started',
+    title: 'How to sign up and get access',
+    desc: 'Access to Verity is invitation-only. Learn how to request access, what to expect after your first login, and how to navigate your dashboard.',
+    cta: 'Read guide',
+    ctaIcon: '📋',
+    bg: 'var(--blue-l)',
+    light: false,
+    type: 'guide',
+  },
+  {
+    id: 'articles',
+    tag: 'Read',
+    title: 'From the Director of Education',
+    desc: 'Articles, reflections, and theological resources published on Medium — formation content available to the wider VOW Center community.',
+    cta: 'Browse articles',
+    ctaIcon: '✦',
+    bg: '#F4F1E8',
+    light: false,
+    type: 'articles',
+  },
 ]
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const [settings,   setSettings]   = useState(DEFAULT_SETTINGS)
-  const [pathway,    setPathway]     = useState(DEFAULT_PATHWAY)
-  const [articles,   setArticles]   = useState(DEFAULT_ARTICLES)
-  const [courses,    setCourses]     = useState([])
-  const [resources,  setResources]  = useState([])
-  const [marquee,    setMarquee]    = useState(DEFAULT_MARQUEE)
+  const [settings,   setSettings]  = useState(DEFAULT_SETTINGS)
+  const [pathway,    setPathway]   = useState(DEFAULT_PATHWAY)
+  const [articles,   setArticles]  = useState(DEFAULT_ARTICLES)
+  const [courses,    setCourses]   = useState([])
+  const [resources,  setResources] = useState([])
+  const [marquee,    setMarquee]   = useState(DEFAULT_MARQUEE)
   const [activeStep, setActiveStep] = useState(0)
+  const [carouselIdx, setCarouselIdx] = useState(0)
   const marqueeTrackRef = useRef(null)
 
   const step     = pathway[activeStep]     ?? DEFAULT_PATHWAY[0]
@@ -90,27 +148,52 @@ export default function HomePage() {
     load()
   }, [])
 
+  // Auto-advance carousel
+  useEffect(() => {
+    const t = setInterval(() => setCarouselIdx(i => (i + 1) % CAROUSEL_SLIDES.length), 6000)
+    return () => clearInterval(t)
+  }, [])
+
   const marqueeItems = [...articles, ...articles]
+  const slide = CAROUSEL_SLIDES[carouselIdx]
 
   return (
     <div className={styles.page}>
       <Nav />
 
+      {/* ── ANNOUNCEMENT BANNER — This Month's Discipleship Module ── */}
+      <div className={styles.announceBanner}>
+        <div className={styles.announceInner}>
+          <div className={styles.announcePill}>
+            <span className={styles.announceDot} />
+            {marquee.label}
+          </div>
+          <div className={styles.announceContent}>
+            <span className={styles.announceTitle}>{marquee.title}</span>
+            {marquee.subtitle && (
+              <span className={styles.announceSub}> — {marquee.subtitle}</span>
+            )}
+          </div>
+          <button className={styles.announceBtn} onClick={() => navigate('/login')}>
+            View module →
+          </button>
+        </div>
+      </div>
+
       {/* ════════════════════════════
-          HERO — tinted bg, chevron nav
+          HERO
       ════════════════════════════ */}
       <section className={styles.hero}>
         <div className={styles.heroDots} />
 
         <div className={styles.heroInner}>
 
-          {/* ── LEFT col ── */}
+          {/* LEFT */}
           <div className={styles.heroLeft}>
             <div className={styles.eyebrow}>
               <span className={styles.eyeDot} />
               VOW Center · Verity Outreach
             </div>
-
             <h1 className={styles.h1}>
               {settings.hero_headline.split(' ').map((word, i) => {
                 const clean = word.toLowerCase().replace(/[^a-z]/g, '')
@@ -119,58 +202,44 @@ export default function HomePage() {
                   : <span key={i}>{word} </span>
               })}
             </h1>
-
             <p className={styles.heroSub}>{settings.hero_subtext}</p>
-
             <div className={styles.heroCta}>
-              <Button variant="ink" size="lg" onClick={() => navigate('/login')}>
-                Start learning →
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/explore')}>
-                Explore
-              </Button>
+              <Button variant="ink" size="lg" onClick={() => navigate('/login')}>Start learning →</Button>
+              <Button variant="outline" size="lg" onClick={() => navigate('/explore')}>Explore</Button>
             </div>
             <p className={styles.heroNote}>Access is granted by VOW Center leadership.</p>
           </div>
 
-          {/* ── RIGHT col ── */}
+          {/* RIGHT — chevrons + graphic */}
           <div className={styles.heroRight}>
 
-            {/* Chevron path navigation — stacked vertically */}
+            {/* Chevron nav */}
             <div className={styles.chevronNav}>
               {pathway.map((s, i) => (
                 <button
                   key={s.step_number}
-                  className={[
-                    styles.chevronItem,
-                    styles[CHEVRON_SHAPES[i % 4]],
-                    i === activeStep ? styles.chevronActive : '',
-                  ].join(' ')}
+                  className={[styles.chevronItem, styles[CHEVRON_SHAPES[i%4]], i===activeStep ? styles.chevronActive : ''].join(' ')}
                   onClick={() => setActiveStep(i)}
-                  style={{
-                    '--step-accent': STEP_META[i % 4].accentColor,
-                  }}
+                  style={{ '--step-accent': STEP_META[i%4].accentColor }}
                 >
                   <span className={styles.chevronNum}>{String(s.step_number).padStart(2,'0')}</span>
                   <span className={styles.chevronName}>{s.name}</span>
                   <span className={styles.chevronSub}>{s.sub_label}</span>
-                  {/* The chevron arrow pointer */}
-                  <span className={styles.chevronArrow} aria-hidden="true" />
                 </button>
               ))}
             </div>
 
-            {/* Graphic frame — changes per step */}
+            {/* Graphic — no border, chips fully dynamic */}
             <div className={styles.graphicWrap}>
               {pathway.map((s, i) => (
                 <div
                   key={s.step_number}
-                  className={[styles.frame, i === activeStep ? styles.frameActive : ''].join(' ')}
+                  className={[styles.frame, i===activeStep ? styles.frameActive : ''].join(' ')}
                   style={{
                     background: s.image_url
                       ? `url(${s.image_url}) center/cover no-repeat`
-                      : STEP_META[i % 4].frameBg,
-                    border: `1px solid ${STEP_META[i % 4].frameBorder}`,
+                      : STEP_META[i%4].frameBg,
+                    border: 'none',
                   }}
                 >
                   {!s.image_url && (
@@ -178,56 +247,38 @@ export default function HomePage() {
                       <span className={styles.frameEmoji}>{s.emoji}</span>
                       <span className={styles.frameLabel}>{s.name}</span>
                       <span className={styles.frameSub}>{s.description}</span>
-                      <span
-                        className={`badge ${
-                          i === 0 ? 'badge-grey' :
-                          i === 1 ? 'badge-blue' :
-                          i === 3 ? 'badge-orange' : 'badge-grey'
-                        }`}
-                        style={{ marginTop: 4 }}
-                      >
+                      <span className={`badge ${['badge-grey','badge-blue','badge-grey','badge-orange'][i%4]}`} style={{marginTop:4}}>
                         {s.module_label}
                       </span>
                     </>
                   )}
-                  {settings.hero_fg_person_url && i === activeStep && (
+                  {settings.hero_fg_person_url && i===activeStep && (
                     <img src={settings.hero_fg_person_url} alt="" className={styles.frameFg} />
                   )}
                 </div>
               ))}
 
-              {/* Floating chips — content + icon changes per step */}
-              <div className={`${styles.chip} ${styles.chip1}`}
-                style={{ '--chip-bg': stepMeta.chipBg }}>
-                <div className={styles.chipIcon}>{stepMeta.chipIcon}</div>
-                <div>
-                  <div className={styles.chipVal}>{settings.chip_1_value}</div>
-                  <div className={styles.chipLbl}>{settings.chip_1_label}</div>
+              {/* Dynamic chips — position, content, icon all change per step */}
+              {stepMeta.chips.map((chip, ci) => (
+                <div
+                  key={`${activeStep}-${ci}`}
+                  className={styles.chip}
+                  style={{ ...chip.style, animationDelay: chip.delay, '--chip-bg': chip.bg }}
+                >
+                  <div className={styles.chipIcon}>{chip.icon}</div>
+                  <div>
+                    <div className={styles.chipVal}>{chip.val}</div>
+                    <div className={styles.chipLbl}>{chip.lbl}</div>
+                  </div>
                 </div>
-              </div>
-              <div className={`${styles.chip} ${styles.chip2}`}
-                style={{ '--chip-bg': 'var(--blue-l)' }}>
-                <div className={styles.chipIcon}>👥</div>
-                <div>
-                  <div className={styles.chipVal}>{settings.chip_2_value}</div>
-                  <div className={styles.chipLbl}>{settings.chip_2_label}</div>
-                </div>
-              </div>
-              <div className={`${styles.chip} ${styles.chip3}`}
-                style={{ '--chip-bg': 'var(--orange-l)' }}>
-                <div className={styles.chipIcon}>✅</div>
-                <div>
-                  <div className={styles.chipVal}>{settings.chip_3_value}</div>
-                  <div className={styles.chipLbl}>{settings.chip_3_label}</div>
-                </div>
-              </div>
+              ))}
             </div>
 
-          </div>{/* /heroRight */}
-        </div>{/* /heroInner */}
+          </div>
+        </div>
       </section>
 
-      {/* ── MARQUEE BAR — grey background, white text, replaces pathway strip ── */}
+      {/* ── MARQUEE BAR — dark grey, white text ── */}
       <div className={styles.marqueeBar}>
         <div className={styles.marqueeLbl}>
           <span className={styles.marqueeDot}>✦</span>
@@ -238,23 +289,30 @@ export default function HomePage() {
           onMouseEnter={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','paused')}
           onMouseLeave={() => marqueeTrackRef.current?.style.setProperty('animation-play-state','running')}
         >
-          <div className={styles.fadeLeft}  />
+          <div className={styles.fadeLeft} />
           <div className={styles.fadeRight} />
           <div className={styles.marqueeTrack} ref={marqueeTrackRef}>
             {marqueeItems.map((a, i) => (
-              <a
-                key={i}
-                href={a.url ?? '#'}
-                target={a.url ? '_blank' : '_self'}
-                rel="noreferrer"
-                className={styles.marqueeItem}
-              >
+              <a key={i} href={a.url ?? '#'} target={a.url ? '_blank' : '_self'}
+                rel="noreferrer" className={styles.marqueeItem}>
                 <span className={styles.mTag}>{a.tag}</span>
                 <span className={styles.mTitle}>{a.title}</span>
                 <span className={styles.mArrow}>→</span>
               </a>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ── SCRIPTURE BAR ── */}
+      <div className={styles.scriptureBar}>
+        <div className={styles.scriptureInner}>
+          <span className={styles.scriptureRule} />
+          <blockquote className={styles.scriptureText}>
+            "{marquee.scripture_text}"
+          </blockquote>
+          <span className={styles.scriptureRef}>— {marquee.scripture_ref}</span>
+          <span className={styles.scriptureRule} />
         </div>
       </div>
 
@@ -319,7 +377,7 @@ export default function HomePage() {
                     <div className={styles.dropCta}>
                       {r.resource_url
                         ? <a href={r.resource_url} target="_blank" rel="noreferrer" className={styles.dropLink}>Access →</a>
-                        : <span style={{ color: 'var(--grey-mid)', fontSize: 13 }}>Coming soon</span>
+                        : <span style={{ color:'var(--grey-mid)', fontSize:13 }}>Coming soon</span>
                       }
                     </div>
                   </div>
@@ -342,13 +400,13 @@ export default function HomePage() {
           </div>
           <div className={styles.toolGrid}>
             {[
-              { icon: '📋', bg: 'var(--grey-bg)',  title: 'Bible Study Guide',      desc: 'Structured templates for weekly Bible study facilitation.' },
-              { icon: '🏛️', bg: 'var(--blue-l)',   title: 'Foundation Class Guide', desc: 'Curriculum support for new members class instructors.' },
-              { icon: '🎯', bg: 'var(--grey-bg)',  title: 'Teaching Mechanism',     desc: 'AI slide builder that walks you through a structured presentation.' },
-              { icon: '📤', bg: 'var(--orange-l)', title: 'Share Content',           desc: 'Send a resource or announcement to your managed email list.', orange: true },
+              { icon:'📋', bg:'var(--grey-bg)',  title:'Bible Study Guide',      desc:'Structured templates for weekly Bible study facilitation.' },
+              { icon:'🏛️', bg:'var(--blue-l)',   title:'Foundation Class Guide', desc:'Curriculum support for new members class instructors.' },
+              { icon:'🎯', bg:'var(--grey-bg)',  title:'Teaching Mechanism',     desc:'AI slide builder that walks you through a structured presentation.' },
+              { icon:'📤', bg:'var(--orange-l)', title:'Share Content',           desc:'Send a resource or announcement to your managed email list.', orange:true },
             ].map((t, i) => (
               <div key={i} className={styles.toolCard}>
-                <div className={styles.toolIcon} style={{ background: t.bg }}>{t.icon}</div>
+                <div className={styles.toolIcon} style={{ background:t.bg }}>{t.icon}</div>
                 <div className={styles.toolTitle}>{t.title}</div>
                 <div className={styles.toolDesc}>{t.desc}</div>
                 <div className={styles.toolCta} style={{ color: t.orange ? 'var(--orange)' : 'var(--blue)' }}>
@@ -356,6 +414,70 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── BOTTOM CAROUSEL — Welcome video · Sign up guide · Read articles ── */}
+      <div className={styles.carouselSection}>
+        <div className={styles.carouselInner}>
+          <div className={styles.carouselHeader}>
+            <div className={styles.secTag} style={{ color:'rgba(255,255,255,0.5)' }}>Getting started</div>
+            <h2 className={styles.carouselH2}>New here? Start with these</h2>
+          </div>
+
+          <div className={styles.carouselStage}>
+            {/* Slide panels */}
+            <div className={styles.carouselTrack}>
+              {CAROUSEL_SLIDES.map((sl, i) => (
+                <div
+                  key={sl.id}
+                  className={[styles.carouselSlide, i === carouselIdx ? styles.slideActive : ''].join(' ')}
+                  style={{ background: sl.bg }}
+                >
+                  {/* Video placeholder or icon */}
+                  <div className={[styles.slideMedia, sl.light ? styles.slideMediaLight : ''].join(' ')}>
+                    {sl.type === 'video' && (
+                      <div className={styles.playBtn}>
+                        <span>▶</span>
+                      </div>
+                    )}
+                    {sl.type === 'guide' && <span className={styles.slideIcon}>📋</span>}
+                    {sl.type === 'articles' && <span className={styles.slideIcon}>✦</span>}
+                  </div>
+                  <div className={[styles.slideBody, sl.light ? styles.slideBodyLight : ''].join(' ')}>
+                    <div className={styles.slideTag}>{sl.tag}</div>
+                    <div className={styles.slideTitle}>{sl.title}</div>
+                    <p className={styles.slideDesc}>{sl.desc}</p>
+                    <button className={[styles.slideCta, sl.light ? styles.slideCtaLight : ''].join(' ')}
+                      onClick={() => navigate(sl.type === 'articles' ? '/explore' : '/login')}>
+                      {sl.ctaIcon} {sl.cta}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Dots + arrows */}
+            <div className={styles.carouselControls}>
+              <button className={styles.carouselArrow}
+                onClick={() => setCarouselIdx(i => (i - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length)}>
+                ←
+              </button>
+              <div className={styles.carouselDots}>
+                {CAROUSEL_SLIDES.map((_, i) => (
+                  <button
+                    key={i}
+                    className={[styles.dot, i === carouselIdx ? styles.dotActive : ''].join(' ')}
+                    onClick={() => setCarouselIdx(i)}
+                  />
+                ))}
+              </div>
+              <button className={styles.carouselArrow}
+                onClick={() => setCarouselIdx(i => (i + 1) % CAROUSEL_SLIDES.length)}>
+                →
+              </button>
+            </div>
           </div>
         </div>
       </div>
