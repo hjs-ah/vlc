@@ -192,12 +192,13 @@ export default function HomePage() {
       <section className={styles.hero}>
         <div className={styles.heroDots} />
 
-        {/* City sketch — anchored to hero bottom, offset left */}
+        {/* City sketch — anchored to hero bottom, offset left of center */}
         <img
           src="/assets/city-sketch.png"
           alt=""
           className={styles.citySketch}
           draggable="false"
+          onError={e => { e.currentTarget.src = '/assets/city-sketch.svg' }}
         />
 
         <div className={styles.heroInner}>
