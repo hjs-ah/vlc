@@ -387,13 +387,13 @@
   .toolGrid { grid-template-columns: 1fr 1fr; }
 }
 
-/* ══ ANNOUNCEMENT BANNER ══ */
+/* ══ ANNOUNCEMENT BANNER — inverted: white bg, dark text ══ */
 .announceBanner {
-  background: var(--ink);
+  background: #fff;
   position: sticky;
-  top: 64px; /* nav height */
+  top: 64px;
   z-index: 80;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid var(--grey-rule);
 }
 .announceInner {
   max-width: 1200px;
@@ -408,15 +408,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--ink);
+  border: 1px solid var(--ink);
   border-radius: 20px;
   padding: 3px 11px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.85);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -429,18 +429,18 @@
 .announceContent {
   flex: 1;
   font-size: 13px;
-  color: rgba(255,255,255,0.8);
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.announceTitle { font-weight: 600; }
-.announceSub   { color: rgba(255,255,255,0.5); font-weight: 400; }
+.announceTitle { font-weight: 600; color: var(--ink); }
+.announceSub   { color: var(--grey-text); font-weight: 400; }
 .announceBtn {
   flex-shrink: 0;
   font-size: 12px;
   font-weight: 600;
-  color: var(--blue);
+  color: var(--orange);
   background: none;
   border: none;
   cursor: pointer;
@@ -448,7 +448,7 @@
   transition: color 0.15s;
   padding: 0;
 }
-.announceBtn:hover { color: #fff; }
+.announceBtn:hover { color: var(--ink); }
 
 /* ══ SCRIPTURE BAR ══ */
 .scriptureBar {
@@ -650,4 +650,108 @@
   .carouselTrack  { height: auto; }
   .carouselSlide  { flex-direction: column; }
   .slideMedia     { width: 100%; height: 140px; }
+}
+
+/* ══ CITY SKETCH — absolutely positioned in hero bg ══ */
+.citySketch {
+  position: absolute;
+  bottom: 0;
+  /* offset ~200px left of center — with 1200px inner, center is 50% of hero width */
+  left: calc(50% - 200px - 300px); /* shift left of center by 200px, then offset for img width */
+  width: 700px;
+  max-width: 60vw;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  user-select: none;
+}
+
+/* ══ STAY LOCKED IN — event bubbles ══ */
+.staySection {
+  /* Sits in heroLeft flow, below heroNote, pushed by margin-bottom:350px on heroLeft */
+  margin-top: 48px;
+  position: relative;
+  z-index: 2;
+}
+.stayLabel {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stayLabel::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--orange);
+  opacity: 0.3;
+  max-width: 160px;
+}
+.eventBubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.eventBubble {
+  background: #fff;
+  border: 1px solid var(--grey-rule);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  box-shadow: var(--sh-sm);
+  animation: chipFloat 5s ease-in-out infinite;
+  max-width: 320px;
+  cursor: default;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.eventBubble:nth-child(2) { animation-delay: 1.8s; margin-left: 16px; }
+.eventBubble:nth-child(3) { animation-delay: 0.9s; margin-left: 8px; }
+.eventBubble:hover {
+  box-shadow: var(--sh);
+  border-color: var(--grey-mid);
+}
+.eventTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.eventTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+.eventDot {
+  /* Unicode bullet · */
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--grey-mid);
+  flex-shrink: 0;
+  display: inline-block;
+}
+.eventTime {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--grey-text);
+}
+.eventDesc {
+  font-size: 12.5px;
+  color: var(--grey-text);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .citySketch { display: none; }
+  .staySection { margin-top: 32px; }
+  .eventBubble { max-width: 100%; }
+  .eventBubble:nth-child(2), .eventBubble:nth-child(3) { margin-left: 0; }
+  .announceInner { padding: 0 20px; }
 }

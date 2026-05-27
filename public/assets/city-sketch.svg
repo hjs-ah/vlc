@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" fill="none" stroke="#4A8BBF" stroke-width="1" opacity="0.4">
+  <!-- Skyline silhouette placeholder -->
+  <rect x="50" y="180" width="40" height="120"/>
+  <rect x="100" y="140" width="60" height="160"/>
+  <rect x="170" y="100" width="50" height="200"/>
+  <rect x="230" y="60" width="70" height="240"/>
+  <rect x="310" y="120" width="45" height="180"/>
+  <rect x="365" y="80" width="55" height="220"/>
+  <rect x="430" y="150" width="40" height="150"/>
+  <rect x="480" y="50" width="80" height="250"/>
+  <rect x="570" y="110" width="50" height="190"/>
+  <rect x="630" y="90" width="60" height="210"/>
+  <rect x="700" y="140" width="45" height="160"/>
+  <rect x="755" y="170" width="40" height="130"/>
+  <rect x="805" y="120" width="55" height="180"/>
+</svg>

@@ -121,22 +121,27 @@ export default function HomePage() {
   const [courses,    setCourses]   = useState([])
   const [resources,  setResources] = useState([])
   const [marquee,    setMarquee]   = useState(DEFAULT_MARQUEE)
+  const [events,     setEvents]    = useState([])
   const [activeStep, setActiveStep] = useState(0)
+  const [hovered,    setHovered]   = useState(null)
   const [carouselIdx, setCarouselIdx] = useState(0)
   const marqueeTrackRef = useRef(null)
 
-  const step     = pathway[activeStep]     ?? DEFAULT_PATHWAY[0]
-  const stepMeta = STEP_META[activeStep % 4]
+  // hover preview overrides active step for frame/chips, click locks it
+  const displayStep = hovered !== null ? hovered : activeStep
+  const step     = pathway[displayStep]     ?? DEFAULT_PATHWAY[0]
+  const stepMeta = STEP_META[displayStep % 4]
 
   useEffect(() => {
     async function load() {
-      const [{ data: s }, { data: p }, { data: a }, { data: c }, { data: r }, { data: m }] = await Promise.all([
+      const [{ data: s }, { data: p }, { data: a }, { data: c }, { data: r }, { data: m }, { data: ev }] = await Promise.all([
         supabase.from('home_settings').select('*').single(),
         supabase.from('home_pathway').select('*').order('step_number'),
         supabase.from('home_publications').select('tag,title,url').eq('active', true).order('sort_order'),
         supabase.from('courses').select('*').eq('active', true).order('sort_order'),
         supabase.from('home_resources').select('*').eq('active', true).order('sort_order'),
         supabase.from('home_marquee').select('*').eq('active', true).order('sort_order').limit(1).single(),
+        supabase.from('home_events').select('*').eq('active', true).order('sort_order'),
       ])
       if (s) setSettings(s)
       if (p?.length) setPathway(p)
@@ -144,6 +149,7 @@ export default function HomePage() {
       if (c?.length) setCourses(c)
       if (r?.length) setResources(r)
       if (m) setMarquee(m)
+      if (ev?.length) setEvents(ev)
     }
     load()
   }, [])
@@ -186,6 +192,14 @@ export default function HomePage() {
       <section className={styles.hero}>
         <div className={styles.heroDots} />
 
+        {/* City sketch — anchored to hero bottom, offset left */}
+        <img
+          src="/assets/city-sketch.svg"
+          alt=""
+          className={styles.citySketch}
+          draggable="false"
+        />
+
         <div className={styles.heroInner}>
 
           {/* LEFT */}
@@ -208,6 +222,34 @@ export default function HomePage() {
               <Button variant="outline" size="lg" onClick={() => navigate('/explore')}>Explore</Button>
             </div>
             <p className={styles.heroNote}>Access is granted by VOW Center leadership.</p>
+
+            {/* ── STAY LOCKED IN ── */}
+            {(events.length > 0 || true) && (
+              <div className={styles.staySection}>
+                <div className={styles.stayLabel}>Stay Locked In!</div>
+                <div className={styles.eventBubbles}>
+                  {(events.length > 0
+                    ? events
+                    : [
+                        { id:1, title:'Bible Study',      day_time:'TUESDAY AT 7PM',   description:'Weekly gathering for scripture study, discussion, and applied teaching.' },
+                        { id:2, title:'Bible Foundation',  day_time:'SUNDAY AT 10AM',   description:'New members foundation class — exploring core beliefs and community covenant.' },
+                        { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', description:'Formation and mentorship session for youth at VOW Center.' },
+                      ]
+                  ).map(ev => (
+                    <div key={ev.id} className={styles.eventBubble}>
+                      <div className={styles.eventTop}>
+                        <span className={styles.eventTitle}>{ev.title}</span>
+                        <span className={styles.eventDot} />
+                        <span className={styles.eventTime}>{ev.day_time}</span>
+                      </div>
+                      {ev.description && (
+                        <div className={styles.eventDesc}>{ev.description}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT — chevrons + graphic */}
@@ -218,7 +260,9 @@ export default function HomePage() {
               {pathway.map((s, i) => (
                 <button
                   key={s.step_number}
-                  className={[styles.chevronItem, styles[CHEVRON_SHAPES[i%4]], i===activeStep ? styles.chevronActive : ''].join(' ')}
+                  className={[styles.chevronItem, styles[CHEVRON_SHAPES[i%4]], i===displayStep ? styles.chevronActive : ''].join(' ')}
+                  onMouseEnter={() => setHovered(i)}
+                  onMouseLeave={() => setHovered(null)}
                   onClick={() => setActiveStep(i)}
                   style={{ '--step-accent': STEP_META[i%4].accentColor }}
                 >
@@ -234,7 +278,7 @@ export default function HomePage() {
               {pathway.map((s, i) => (
                 <div
                   key={s.step_number}
-                  className={[styles.frame, i===activeStep ? styles.frameActive : ''].join(' ')}
+                  className={[styles.frame, i===displayStep ? styles.frameActive : ''].join(' ')}
                   style={{
                     background: s.image_url
                       ? `url(${s.image_url}) center/cover no-repeat`
@@ -252,16 +296,16 @@ export default function HomePage() {
                       </span>
                     </>
                   )}
-                  {settings.hero_fg_person_url && i===activeStep && (
+                  {settings.hero_fg_person_url && i===displayStep && (
                     <img src={settings.hero_fg_person_url} alt="" className={styles.frameFg} />
                   )}
                 </div>
               ))}
 
-              {/* Dynamic chips — position, content, icon all change per step */}
+              {/* Dynamic chips — all position + content change per displayed step */}
               {stepMeta.chips.map((chip, ci) => (
                 <div
-                  key={`${activeStep}-${ci}`}
+                  key={`${displayStep}-${ci}`}
                   className={styles.chip}
                   style={{ ...chip.style, animationDelay: chip.delay, '--chip-bg': chip.bg }}
                 >
