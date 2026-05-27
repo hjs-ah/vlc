@@ -378,8 +378,13 @@ export default function HomePage() {
               thumb_color_start: '#1a1a1a', thumb_color_end: '#444',
             }))).map(c => (
               <div key={c.id} className={styles.courseCard}>
-                <div className={styles.courseThumb}
-                  style={{ background: `linear-gradient(135deg, ${c.thumb_color_start}, ${c.thumb_color_end})` }}>
+                <div
+                  className={styles.courseThumb}
+                  style={c.thumbnail_url
+                    ? { backgroundImage: `url(${c.thumbnail_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                    : { background: `linear-gradient(135deg, ${c.thumb_color_start ?? '#1a1a1a'}, ${c.thumb_color_end ?? '#444'})` }
+                  }
+                >
                   <span className={styles.courseBadge}>{c.badge_label}</span>
                 </div>
                 <div className={styles.courseBody}>
