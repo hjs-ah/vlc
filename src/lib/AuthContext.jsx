@@ -9,14 +9,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (session) fetchProfile(session.user.id)
       else setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session)
@@ -30,14 +28,36 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle() // returns null instead of error when row missing
 
-    if (!error) setProfile(data)
-    setLoading(false)
+      if (data) {
+        setProfile(data)
+      } else {
+        // Auth succeeded but no profile row yet — create a minimal one
+        // so the user isn't permanently stuck
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const fallback = {
+            id: userId,
+            full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User',
+            email: user.email,
+            role: 'student',
+            active: true,
+          }
+          await supabase.from('profiles').upsert(fallback)
+          setProfile(fallback)
+        }
+      }
+    } catch (e) {
+      console.error('fetchProfile error:', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function signOut() {

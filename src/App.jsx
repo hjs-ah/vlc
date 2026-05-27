@@ -40,6 +40,7 @@ export default function App() {
             <Route path="assignments"   element={<Stub name="Assignments" />} />
             <Route path="grades"        element={<Stub name="Grades" />} />
             <Route path="discussions"   element={<Stub name="Discussions" />} />
+            <Route path="schedule"       element={<Stub name="Schedule" />} />
             <Route path="gradebook"     element={<Stub name="Grade Book" />} />
             <Route path="tools"         element={<Stub name="Instructor Tools" />} />
           </Route>

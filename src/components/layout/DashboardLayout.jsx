@@ -11,6 +11,7 @@ const TITLES = {
   '/dashboard/discussions': 'Discussions',
   '/dashboard/gradebook':   'Grade book',
   '/dashboard/tools':       'Instructor tools',
+  '/dashboard/schedule':     'Schedule',
 }
 
 const BellIcon = () => (

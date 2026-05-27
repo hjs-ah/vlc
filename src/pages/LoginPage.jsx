@@ -19,15 +19,15 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      // Friendlier messages
-      if (error.message.includes('Invalid login')) {
-        setError('Email or password is incorrect. Contact your administrator if you need a reset.')
+      if (error.message.includes('Invalid login') || error.message.includes('invalid_credentials')) {
+        setError('Email or password is incorrect.')
       } else {
         setError(error.message)
       }
       setLoading(false)
     } else {
-      navigate('/dashboard')
+      // Small delay to let AuthContext finish fetching the profile
+      setTimeout(() => navigate('/dashboard'), 300)
     }
   }
 
