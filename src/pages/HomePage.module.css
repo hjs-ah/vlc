@@ -674,7 +674,7 @@
   max-width: 60vw;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.40;
+  opacity: 1;
   user-select: none;
 }
 
