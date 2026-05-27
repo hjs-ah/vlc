@@ -28,6 +28,7 @@
   gap: 48px;
   position: relative;
   z-index: 1;
+  margin-top: 130px;
 }
 
 /* LEFT */
@@ -36,7 +37,7 @@
   max-width: 480px;
   display: flex;
   flex-direction: column;
-  margin-bottom: 350px; /* as specified */
+  margin-bottom: 130px; /* as specified */
 }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
@@ -389,7 +390,7 @@
 
 /* ══ ANNOUNCEMENT BANNER — inverted: white bg, dark text ══ */
 .announceBanner {
-  background: #fff;
+  background: #f7f7f7;
   position: sticky;
   top: 64px;
   z-index: 80;
@@ -669,7 +670,7 @@
 /* ══ STAY LOCKED IN — event bubbles ══ */
 .staySection {
   /* Sits in heroLeft flow, below heroNote, pushed by margin-bottom:350px on heroLeft */
-  margin-top: 48px;
+  margin-top: 88px;
   position: relative;
   z-index: 2;
 }

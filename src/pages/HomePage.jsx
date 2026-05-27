@@ -194,7 +194,7 @@ export default function HomePage() {
 
         {/* City sketch — anchored to hero bottom, offset left */}
         <img
-          src="/assets/city-sketch.svg"
+          src="/assets/city-sketch.png"
           alt=""
           className={styles.citySketch}
           draggable="false"
