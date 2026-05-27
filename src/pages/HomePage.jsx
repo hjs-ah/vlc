@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS = {
   chip_2_value: '120+', chip_2_label: 'Members Enrolled',
   chip_3_value: '68%', chip_3_label: 'Avg Completion',
   marquee_label: 'From the Director of Education',
+  show_view_all: false,
 }
 
 const DEFAULT_PATHWAY = [
@@ -370,7 +371,7 @@ export default function HomePage() {
               <h2 className={styles.secH2}>Available learning tracks</h2>
               <p className={styles.secSub}>Structured formation pathways for every stage of your journey with VOW Center.</p>
             </div>
-            <Button variant="outline" size="sm">View all</Button>
+            {settings.show_view_all && <Button variant="outline" size="sm">View all</Button>}
           </div>
           <div className={styles.courseGrid}>
             {(courses.length ? courses : DEFAULT_PATHWAY.map((s, i) => ({
@@ -411,7 +412,7 @@ export default function HomePage() {
                 <h2 className={styles.secH2}>Resources & teachings</h2>
                 <p className={styles.secSub}>One-off programs, tools, and drops from VOW Center.</p>
               </div>
-              <Link to="/explore"><Button variant="outline" size="sm">See all →</Button></Link>
+              {settings.show_view_all && <Link to="/explore"><Button variant="outline" size="sm">See all →</Button></Link>}
             </div>
             <div className={styles.dropsGrid}>
               {resources.map(r => (
