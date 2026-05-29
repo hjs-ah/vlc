@@ -27,8 +27,14 @@ export default function DashboardHome() {
   const [allEnrollments, setAllEnrollments] = useState([]) // instructor: all students
   const [loading, setLoading] = useState(true)
 
+  const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? 'there'
   const hour = now.getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
+  function getInitials(name) {
+    if (!name) return '?'
+    return name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+  }
 
   useEffect(() => {
     if (!profile) return
@@ -115,9 +121,9 @@ export default function DashboardHome() {
       {/* ── HEADER ── */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <div className={styles.avatar}>{profile?.full_name?.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() ?? 'AT'}</div>
+          <div className={styles.avatar}>{getInitials(profile?.full_name)}</div>
           <div>
-            <h1 className={styles.greeting}>{greeting}, {profile?.full_name?.split(' ')[0] ?? 'there'} 👋</h1>
+            <h1 className={styles.greeting}>{greeting}, {firstName} 👋</h1>
             <div className={styles.dateLine}>{dateStr} | {timeStr}</div>
           </div>
         </div>
