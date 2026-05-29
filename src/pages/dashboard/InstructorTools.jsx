@@ -108,19 +108,23 @@ export default function InstructorTools() {
                         <div className={styles.courseTitle}>{c?.title}</div>
                         <div className={styles.courseBadge}>{c?.badge_label}</div>
                         {/* Tool launcher buttons */}
-                        {tools.length > 0 && (
-                          <div className={styles.toolBtns}>
-                            {tools.map(t => (
-                              <button
-                                key={t.id}
-                                className={styles.toolBtn}
-                                onClick={() => openTool({ ...t, courseTitle: c?.title })}
-                              >
-                                {t.icon} {t.short_label ?? t.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                        <div className={styles.toolBtns}>
+                          {tools.map(t => (
+                            <button
+                              key={t.id}
+                              className={styles.toolBtn}
+                              onClick={() => openTool({ ...t, courseTitle: c?.title })}
+                            >
+                              {t.icon} Workspace
+                            </button>
+                          ))}
+                          <button
+                            className={styles.toolBtnSecondary}
+                            onClick={() => {/* Schedule modal — coming soon */}}
+                          >
+                            📅 Schedule
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )
@@ -167,14 +171,6 @@ export default function InstructorTools() {
               </div>
             </div>
             <div className={styles.frameActions}>
-              <a
-                href={activeTool.tool_url}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.frameOpen}
-              >
-                Open in new tab ↗
-              </a>
               <button className={styles.frameClose} onClick={closeFrame}>
                 ✕ Close
               </button>

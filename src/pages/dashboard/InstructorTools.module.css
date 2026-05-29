@@ -209,3 +209,25 @@
   .courseGrid { grid-template-columns: 1fr; }
   .stdGrid { grid-template-columns: 1fr 1fr; }
 }
+
+/* Secondary tool button (Schedule, etc.) */
+.toolBtnSecondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: var(--grey-bg);
+  border: 1px solid var(--grey-rule);
+  border-radius: var(--rs);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey-dark);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-align: left;
+}
+.toolBtnSecondary:hover {
+  background: var(--grey-rule);
+  color: var(--ink);
+}
