@@ -6,7 +6,8 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import HomePage      from '@/pages/HomePage'
 import LoginPage     from '@/pages/LoginPage'
 import ExplorePage   from '@/pages/ExplorePage'
-import DashboardHome from '@/pages/dashboard/DashboardHome'
+import DashboardHome    from '@/pages/dashboard/DashboardHome'
+import InstructorTools from '@/pages/dashboard/InstructorTools'
 import AdminPage     from '@/pages/admin/AdminPage'
 
 // Lazy stub pages — fill out progressively
@@ -42,7 +43,7 @@ export default function App() {
             <Route path="discussions"   element={<Stub name="Discussions" />} />
             <Route path="schedule"       element={<Stub name="Schedule" />} />
             <Route path="gradebook"     element={<Stub name="Grade Book" />} />
-            <Route path="tools"         element={<Stub name="Instructor Tools" />} />
+            <Route path="tools"         element={<InstructorTools />} />
           </Route>
 
           {/* Admin — requires admin role */}

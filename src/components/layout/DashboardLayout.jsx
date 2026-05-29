@@ -10,7 +10,7 @@ const TITLES = {
   '/dashboard/grades':      'Grades',
   '/dashboard/discussions': 'Discussions',
   '/dashboard/gradebook':   'Grade book',
-  '/dashboard/tools':       'Instructor tools',
+  '/dashboard/tools':       'Instructor Tools',
   '/dashboard/schedule':     'Schedule',
 }
 
