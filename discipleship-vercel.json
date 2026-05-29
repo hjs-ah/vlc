@@ -1,0 +1,18 @@
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOW-FROM https://vlc-rhofdesmn-hjs-ahs-projects.vercel.app"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://*.vercel.app https://vlc-rhofdesmn-hjs-ahs-projects.vercel.app"
+        }
+      ]
+    }
+  ]
+}
