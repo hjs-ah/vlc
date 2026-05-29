@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/AuthContext'
 import styles from './DashboardHome.module.css'
@@ -17,6 +18,8 @@ const SESSION_COLORS = {
 
 export default function DashboardHome() {
   const { profile, isInstructor, isAdmin } = useAuth()
+  const navigate = useNavigate()
+  const [myCourses, setMyCourses] = useState([])
   const [enrollments,    setEnrollments]    = useState([])
   const [assignments,    setAssignments]    = useState([])
   const [schedules,      setSchedules]      = useState([])
@@ -83,6 +86,16 @@ export default function DashboardHome() {
         const [,,{ data: allE }] = results
         if (allE) setAllEnrollments(allE)
       }
+      // Instructors: fetch their assigned courses for the banner
+      if (isInstructor) {
+        const { data: myC } = await supabase
+          .from('course_facilitators')
+          .select('courses(title)')
+          .eq('facilitator_id', profile.id)
+          .eq('active', true)
+        if (myC) setMyCourses(myC.map(r => r.courses?.title).filter(Boolean))
+      }
+
       setLoading(false)
     }
     load()
@@ -118,7 +131,28 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* ── STAT CHIPS (profile card style from reference) ── */}
+      {/* ── FACILITATOR BANNER (instructors only) ── */}
+      {isInstructor && myCourses.length > 0 && (
+        <div className={styles.facBanner}>
+          <div className={styles.facBannerLeft}>
+            <span className={styles.facBannerIcon}>🎓</span>
+            <div>
+              <div className={styles.facBannerTitle}>You're a facilitator!</div>
+              <div className={styles.facBannerSub}>
+                {myCourses.join(' · ')}
+              </div>
+            </div>
+          </div>
+          <button
+            className={styles.facBannerBtn}
+            onClick={() => navigate('/dashboard/tools')}
+          >
+            Open Instructor Tools →
+          </button>
+        </div>
+      )}
+
+      {/* ── STAT CHIPS (profile card style from reference) ── */}}
       <div className={styles.profileCard}>
         <div className={styles.profileProgress}>
           <div className={styles.profileName}>{profile?.full_name}</div>

@@ -5,17 +5,16 @@ import styles from './InstructorTools.module.css'
 
 export default function InstructorTools() {
   const { profile } = useAuth()
-  const [myCourses,   setMyCourses]   = useState([])
-  const [activeTool,  setActiveTool]  = useState(null)  // { label, tool_url, icon, course }
-  const [activeTab,   setActiveTab]   = useState('tools') // 'tools' | course tool id
-  const [loading,     setLoading]     = useState(true)
+  const [myCourses,     setMyCourses]     = useState([])
+  const [activeTool,    setActiveTool]    = useState(null)
+  const [activeTab,     setActiveTab]     = useState('tools')
+  const [loading,       setLoading]       = useState(true)
   const [iframeLoading, setIframeLoading] = useState(false)
 
   useEffect(() => {
     if (!profile) return
     async function load() {
-      // Fetch courses this instructor facilitates + any tools attached
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('course_facilitators')
         .select(`
           role,
@@ -27,32 +26,52 @@ export default function InstructorTools() {
         `)
         .eq('facilitator_id', profile.id)
         .eq('active', true)
-
       if (data) setMyCourses(data)
       setLoading(false)
     }
     load()
   }, [profile])
 
-  // Flatten all tools across all courses for the tab bar
+  // Build tab list — sort_order controls position (Schedule=0, DCW Workspace=1)
   const allTools = myCourses.flatMap(fc =>
     (fc.courses?.course_tools ?? []).map(t => ({
       ...t,
       courseTitle: fc.courses?.title,
-      courseId: fc.courses?.id,
+      courseId:    fc.courses?.id,
     }))
-  ).sort((a,b) => a.sort_order - b.sort_order)
+  ).sort((a, b) => a.sort_order - b.sort_order)
+
+  // Build iframe URL — pass user identity via query params for cross-origin apps
+  function buildToolUrl(tool) {
+    if (!tool.tool_url || tool.tool_url === 'about:blank') return null
+    try {
+      const url = new URL(tool.tool_url)
+      if (profile) {
+        // Pass name + initials so the discipleship app can display who's logged in
+        url.searchParams.set('vlc_user',     profile.full_name ?? '')
+        url.searchParams.set('vlc_initials', getInitials(profile.full_name))
+        url.searchParams.set('vlc_email',    profile.email ?? '')
+        url.searchParams.set('vlc_role',     profile.role ?? 'instructor')
+      }
+      return url.toString()
+    } catch {
+      return tool.tool_url
+    }
+  }
 
   function openTool(tool) {
     setActiveTool(tool)
     setActiveTab(tool.id)
-    setIframeLoading(true)
+    // Only show loading spinner for real URLs
+    setIframeLoading(!!tool.tool_url && tool.tool_url !== 'about:blank')
   }
 
   function closeFrame() {
     setActiveTool(null)
     setActiveTab('tools')
   }
+
+  const isScheduleTab = activeTool?.tool_url === 'about:blank' || !activeTool?.tool_url
 
   return (
     <div className={styles.page}>
@@ -77,11 +96,10 @@ export default function InstructorTools() {
         ))}
       </div>
 
-      {/* ── TOOLS HOME VIEW ── */}
+      {/* ── TOOLS HOME ── */}
       {activeTab === 'tools' && (
         <div className={styles.toolsView}>
 
-          {/* My Courses row */}
           <div className={styles.section}>
             <div className={styles.sectionTitle}>My courses</div>
             {loading ? (
@@ -91,8 +109,8 @@ export default function InstructorTools() {
             ) : (
               <div className={styles.courseGrid}>
                 {myCourses.map(fc => {
-                  const c = fc.courses
-                  const tools = c?.course_tools ?? []
+                  const c     = fc.courses
+                  const tools = (c?.course_tools ?? []).sort((a,b) => a.sort_order - b.sort_order)
                   return (
                     <div key={c?.id} className={styles.courseCard}>
                       <div
@@ -107,23 +125,18 @@ export default function InstructorTools() {
                       <div className={styles.courseBody}>
                         <div className={styles.courseTitle}>{c?.title}</div>
                         <div className={styles.courseBadge}>{c?.badge_label}</div>
-                        {/* Tool launcher buttons */}
                         <div className={styles.toolBtns}>
                           {tools.map(t => (
                             <button
                               key={t.id}
-                              className={styles.toolBtn}
+                              className={t.tool_url && t.tool_url !== 'about:blank'
+                                ? styles.toolBtn
+                                : styles.toolBtnSecondary}
                               onClick={() => openTool({ ...t, courseTitle: c?.title })}
                             >
-                              {t.icon} Workspace
+                              {t.icon} {t.short_label ?? t.label}
                             </button>
                           ))}
-                          <button
-                            className={styles.toolBtnSecondary}
-                            onClick={() => {/* Schedule modal — coming soon */}}
-                          >
-                            📅 Schedule
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -133,15 +146,14 @@ export default function InstructorTools() {
             )}
           </div>
 
-          {/* Standard tools */}
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Teaching resources</div>
             <div className={styles.stdGrid}>
               {[
-                { icon:'📋', title:'Bible Study Guide',      desc:'Structured templates for weekly facilitation.',          bg:'var(--grey-bg)' },
-                { icon:'🏛️', title:'Foundation Class Guide', desc:'Curriculum support for new members class.',              bg:'var(--blue-l)'  },
-                { icon:'🎯', title:'Teaching Mechanism',     desc:'AI slide builder — paste notes, get a live presentation.',bg:'var(--grey-bg)' },
-                { icon:'📤', title:'Share Content',          desc:'Send a resource or announcement to your email list.',    bg:'var(--orange-l)', orange:true },
+                { icon:'📋', title:'Bible Study Guide',      desc:'Structured templates for weekly facilitation.',           bg:'var(--grey-bg)'  },
+                { icon:'🏛️', title:'Foundation Class Guide', desc:'Curriculum support for new members class.',               bg:'var(--blue-l)'   },
+                { icon:'🎯', title:'Teaching Mechanism',     desc:'AI slide builder — paste notes, get a live presentation.',bg:'var(--grey-bg)'  },
+                { icon:'📤', title:'Share Content',          desc:'Send a resource or announcement to your email list.',     bg:'var(--orange-l)', orange:true },
               ].map((t,i) => (
                 <div key={i} className={styles.stdCard}>
                   <div className={styles.stdIcon} style={{ background:t.bg }}>{t.icon}</div>
@@ -157,7 +169,7 @@ export default function InstructorTools() {
         </div>
       )}
 
-      {/* ── IFRAME TOOL VIEW ── */}
+      {/* ── FRAME / PLACEHOLDER VIEW ── */}
       {activeTool && activeTab !== 'tools' && (
         <div className={styles.frameWrap}>
           <div className={styles.frameHeader}>
@@ -171,29 +183,59 @@ export default function InstructorTools() {
               </div>
             </div>
             <div className={styles.frameActions}>
-              <button className={styles.frameClose} onClick={closeFrame}>
-                ✕ Close
-              </button>
+              {/* Show user context being passed — transparency for the instructor */}
+              {!isScheduleTab && profile && (
+                <div className={styles.frameUser}>
+                  <div className={styles.frameUserAvatar}>{getInitials(profile.full_name)}</div>
+                  <span>{profile.full_name}</span>
+                </div>
+              )}
+              <button className={styles.frameClose} onClick={closeFrame}>✕ Close</button>
             </div>
           </div>
 
-          {iframeLoading && (
-            <div className={styles.frameLoading}>
-              <div className={styles.frameSpinner} />
-              Loading {activeTool.label}…
+          {/* Schedule placeholder */}
+          {isScheduleTab && (
+            <div className={styles.schedulePlaceholder}>
+              <div className={styles.spIcon}>📅</div>
+              <div className={styles.spTitle}>Schedule</div>
+              <p className={styles.spText}>
+                The schedule view for <strong>{activeTool.courseTitle}</strong> is coming soon.
+                Session times and facilitation details will appear here.
+              </p>
+              <div className={styles.spNote}>
+                For now, manage session times in the schedules table in Supabase,
+                or in the Upcoming Sessions card on your dashboard home.
+              </div>
             </div>
           )}
 
-          <iframe
-            src={activeTool.tool_url}
-            className={styles.frame}
-            title={activeTool.label}
-            onLoad={() => setIframeLoading(false)}
-            allow="clipboard-read; clipboard-write"
-            style={{ opacity: iframeLoading ? 0 : 1 }}
-          />
+          {/* Real iframe */}
+          {!isScheduleTab && (
+            <>
+              {iframeLoading && (
+                <div className={styles.frameLoading}>
+                  <div className={styles.frameSpinner} />
+                  Loading {activeTool.label}…
+                </div>
+              )}
+              <iframe
+                src={buildToolUrl(activeTool)}
+                className={styles.frame}
+                title={activeTool.label}
+                onLoad={() => setIframeLoading(false)}
+                allow="clipboard-read; clipboard-write"
+                style={{ opacity: iframeLoading ? 0 : 1 }}
+              />
+            </>
+          )}
         </div>
       )}
     </div>
   )
+}
+
+function getInitials(name) {
+  if (!name) return '??'
+  return name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2).toUpperCase()
 }

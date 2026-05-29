@@ -318,3 +318,44 @@
   .rosterHeader, .rosterRow { grid-template-columns: 1fr 1fr auto; }
   .rosterProgress, .rosterCourse { display: none; }
 }
+
+/* ── FACILITATOR BANNER ── */
+.facBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, var(--ink) 0%, #2a3a4a 100%);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.facBannerLeft {
+  display: flex; align-items: center; gap: 12px;
+}
+.facBannerIcon { font-size: 24px; flex-shrink: 0; }
+.facBannerTitle {
+  font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px;
+}
+.facBannerSub {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  letter-spacing: 0.2px;
+}
+.facBannerBtn {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border-radius: var(--rs);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.facBannerBtn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+}

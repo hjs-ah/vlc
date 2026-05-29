@@ -40,6 +40,10 @@ export default function AdminPage() {
   const [editingPub,   setEditingPub]   = useState(null)   // pub row being edited
   const [newPub,       setNewPub]       = useState({ tag:'', title:'', url:'', active:true })
   const [showNewPub,   setShowNewPub]   = useState(false)
+  const [events,       setEvents]       = useState([])
+  const [editingEvent, setEditingEvent] = useState(null)
+  const [showNewEvent, setShowNewEvent] = useState(false)
+  const [newEvent,     setNewEvent]     = useState({ title:'', day_time:'', description:'' })
   const [facView,      setFacView]      = useState([])
   const [courses,      setCourses]      = useState([])
   const [assignUser,   setAssignUser]   = useState('')
@@ -55,7 +59,7 @@ export default function AdminPage() {
   async function loadAll() {
     const [
       { data: s }, { data: u }, { data: el },
-      { data: pc }, { data: pb }, { data: fv }, { data: crs }
+      { data: pc }, { data: pb }, { data: fv }, { data: crs }, { data: evs }
     ] = await Promise.all([
       supabase.from('home_settings').select('*').single(),
       supabase.from('profiles').select('*').order('full_name'),
@@ -63,6 +67,7 @@ export default function AdminPage() {
       supabase.from('home_pathway').select('*').order('step_number'),
       supabase.from('home_publications').select('*').order('sort_order'),
       supabase.from('course_facilitators_view').select('*').order('facilitator_name'),
+      supabase.from('home_events').select('*').order('sort_order'),
       supabase.from('courses').select('id,title,badge_label').eq('active', true).order('sort_order'),
     ])
     if (s)   setSettings(s)
@@ -72,6 +77,36 @@ export default function AdminPage() {
     if (pb)  setPubs(pb)
     if (fv)  setFacView(fv)
     if (crs) setCourses(crs)
+    if (evs) setEvents(evs)
+  }
+
+  // ── EVENTS (Stay Locked In) ──
+  async function saveEvent(ev) {
+    await supabase.from('home_events').update({
+      title: ev.title, day_time: ev.day_time, description: ev.description
+    }).eq('id', ev.id)
+    setEvents(prev => prev.map(e => e.id === ev.id ? ev : e))
+    setEditingEvent(null)
+  }
+  async function addEvent() {
+    if (!newEvent.title || !newEvent.day_time) { alert('Title and time are required.'); return }
+    const { data, error } = await supabase.from('home_events')
+      .insert({ ...newEvent, sort_order: events.length + 1, active: true })
+      .select().single()
+    if (!error && data) {
+      setEvents(e => [...e, data])
+      setNewEvent({ title:'', day_time:'', description:'' })
+      setShowNewEvent(false)
+    }
+  }
+  async function deleteEvent(id) {
+    if (!confirm('Remove this event bubble?')) return
+    await supabase.from('home_events').delete().eq('id', id)
+    setEvents(e => e.filter(x => x.id !== id))
+  }
+  async function toggleEvent(id, active) {
+    await supabase.from('home_events').update({ active: !active }).eq('id', id)
+    setEvents(prev => prev.map(e => e.id === id ? {...e, active: !active} : e))
   }
 
   // ── HERO ──
@@ -346,6 +381,73 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ── STAY LOCKED IN EVENTS ── */}
+        {tab === 'events' && (
+          <div className={`${styles.panel} fade-up`}>
+            <div className={styles.secTitle} style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span>Stay Locked In — event bubbles</span>
+              <Button variant="blue" size="sm" onClick={() => setShowNewEvent(v=>!v)}>
+                {showNewEvent ? 'Cancel' : '+ Add event'}
+              </Button>
+            </div>
+
+            {showNewEvent && (
+              <div className={styles.facAssignCard} style={{marginBottom:20}}>
+                <div className={styles.facAssignTitle}>New event bubble</div>
+                <div style={{display:'grid',gridTemplateColumns:'2fr 2fr',gap:12,marginBottom:12}}>
+                  <Field label="Event name (large text)" value={newEvent.title}    onChange={v=>setNewEvent(e=>({...e,title:v}))} />
+                  <Field label="Day · Time (ALL CAPS)"   value={newEvent.day_time} onChange={v=>setNewEvent(e=>({...e,day_time:v.toUpperCase()}))} />
+                </div>
+                <Field label="Description (smaller text)" value={newEvent.description} onChange={v=>setNewEvent(e=>({...e,description:v}))} textarea />
+                <Button variant="blue" size="sm" onClick={addEvent}>Add bubble</Button>
+              </div>
+            )}
+
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {events.length === 0 && <div className={styles.note}>No events yet.</div>}
+              {events.map(ev => (
+                <div key={ev.id} className={styles.pubRow}>
+                  {editingEvent?.id === ev.id ? (
+                    <div className={styles.pubEditForm}>
+                      <div style={{display:'grid',gridTemplateColumns:'2fr 2fr',gap:12,marginBottom:12}}>
+                        <Field label="Event name" value={editingEvent.title}    onChange={v=>setEditingEvent(e=>({...e,title:v}))} />
+                        <Field label="Day · Time" value={editingEvent.day_time} onChange={v=>setEditingEvent(e=>({...e,day_time:v.toUpperCase()}))} />
+                      </div>
+                      <Field label="Description" value={editingEvent.description||''} onChange={v=>setEditingEvent(e=>({...e,description:v}))} textarea />
+                      <div style={{display:'flex',gap:8,marginTop:8}}>
+                        <Button variant="blue"  size="sm" onClick={()=>saveEvent(editingEvent)}>Save</Button>
+                        <Button variant="ghost" size="sm" onClick={()=>setEditingEvent(null)}>Cancel</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:14,fontWeight:700,color:'var(--ink)'}}>{ev.title}</div>
+                        <div style={{fontSize:11,fontWeight:800,letterSpacing:'0.8px',color:'var(--grey-text)',marginTop:2}}>{ev.day_time}</div>
+                        {ev.description && <div style={{fontSize:12,color:'var(--grey-dark)',marginTop:3}}>{ev.description}</div>}
+                      </div>
+                      <div style={{display:'flex',gap:6,flexShrink:0,alignItems:'center'}}>
+                        <button
+                          className={`badge ${ev.active?'badge-green':'badge-grey'}`}
+                          style={{cursor:'pointer'}}
+                          onClick={()=>toggleEvent(ev.id, ev.active)}
+                        >
+                          {ev.active?'Visible':'Hidden'}
+                        </button>
+                        <Button variant="ghost"  size="sm" onClick={()=>setEditingEvent({...ev})}>Edit</Button>
+                        <Button variant="danger" size="sm" onClick={()=>deleteEvent(ev.id)}>✕</Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className={styles.note} style={{marginTop:12}}>
+              These bubbles appear in the "Stay Locked In" section of the homepage hero. Day/time is displayed in bold caps next to the event name. Sort order controls display sequence.
+            </p>
           </div>
         )}
 

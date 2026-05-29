@@ -231,3 +231,30 @@
   background: var(--grey-rule);
   color: var(--ink);
 }
+
+/* Frame user badge */
+.frameUser {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--grey-dark); font-weight: 500;
+}
+.frameUserAvatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+
+/* Schedule placeholder */
+.schedulePlaceholder {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px 40px; text-align: center;
+  background: var(--grey-bg);
+}
+.spIcon  { font-size: 48px; margin-bottom: 16px; }
+.spTitle { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 10px; letter-spacing: -0.3px; }
+.spText  { font-size: 14.5px; color: var(--grey-dark); line-height: 1.65; max-width: 420px; margin-bottom: 16px; }
+.spNote  { font-size: 12.5px; color: var(--grey-text); max-width: 380px; line-height: 1.55;
+           background: #fff; border: 1px solid var(--grey-rule); border-radius: var(--r);
+           padding: 14px 18px; }
