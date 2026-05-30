@@ -4,118 +4,137 @@ import { supabase } from '@/lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession]   = useState(null)
+  const [session, setSession]   = useState(undefined) // undefined = not yet checked
   const [profile, setProfile]   = useState(null)
   const [loading, setLoading]   = useState(true)
-  const fetchingRef = useRef(false)   // prevents concurrent fetches
-  const profileRef  = useRef(null)    // tracks latest profile without re-renders
+  const fetchingRef  = useRef(false)
+  const profileRef   = useRef(null)
+  const mountedRef   = useRef(true)
 
   useEffect(() => {
-    // Initial session check — only sets loading=false once
+    mountedRef.current = true
+
+    // 1. Grab current session — this is the only thing that matters on load
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mountedRef.current) return
       setSession(session)
-      if (session) {
+      if (session?.user?.id) {
         fetchProfile(session.user.id)
       } else {
         setLoading(false)
       }
     })
 
+    // 2. Listen for auth changes — but be very selective about what triggers a re-fetch
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session)
+      (event, session) => {
+        if (!mountedRef.current) return
 
-        if (!session) {
+        // TOKEN_REFRESHED: silent — session is still valid, profile unchanged
+        if (event === 'TOKEN_REFRESHED') return
+
+        // SIGNED_OUT: clear everything
+        if (event === 'SIGNED_OUT' || !session) {
+          setSession(null)
           setProfile(null)
           profileRef.current = null
           setLoading(false)
           return
         }
 
-        // TOKEN_REFRESHED fires frequently — only re-fetch profile if
-        // we don't already have one for this user
-        if (event === 'TOKEN_REFRESHED' && profileRef.current?.id === session.user.id) {
-          return  // session refreshed but profile unchanged — do nothing
-        }
-
-        // SIGNED_IN or profile missing — fetch it
-        if (event === 'SIGNED_IN' || !profileRef.current) {
-          await fetchProfile(session.user.id)
+        // SIGNED_IN / USER_UPDATED: only re-fetch if user changed
+        if (session?.user?.id && session.user.id !== profileRef.current?.id) {
+          setSession(session)
+          fetchProfile(session.user.id)
         }
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mountedRef.current = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   async function fetchProfile(userId) {
-    // Guard against concurrent fetches racing each other
     if (fetchingRef.current) return
     fetchingRef.current = true
 
-    // Only show loading spinner on first load, not on background refreshes
-    if (!profileRef.current) setLoading(true)
-
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle()
 
+      if (!mountedRef.current) return
+
       if (data) {
         setProfile(data)
         profileRef.current = data
-      } else {
-        // No profile row — create minimal fallback
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const fallback = {
-            id: userId,
-            full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User',
-            email: user.email,
-            role: 'student',
-            active: true,
-          }
-          const { data: created } = await supabase
-            .from('profiles')
-            .upsert(fallback)
-            .select()
-            .single()
-          const final = created ?? fallback
-          setProfile(final)
-          profileRef.current = final
-        }
+        return
       }
-    } catch (e) {
-      console.error('fetchProfile error:', e)
-      // Don't leave loading=true on error
+
+      // No profile row — build a minimal one from auth user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !mountedRef.current) return
+
+      const fallback = {
+        id:        userId,
+        full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User',
+        email:     user.email ?? '',
+        role:      'student',
+        active:    true,
+      }
+
+      // Try to persist it
+      const { data: saved } = await supabase
+        .from('profiles')
+        .upsert(fallback)
+        .select()
+        .maybeSingle()
+
+      const final = saved ?? fallback
+      if (mountedRef.current) {
+        setProfile(final)
+        profileRef.current = final
+      }
+
+    } catch (err) {
+      console.error('[AuthContext] fetchProfile error:', err)
     } finally {
-      setLoading(false)
+      if (mountedRef.current) setLoading(false)
       fetchingRef.current = false
     }
   }
 
   async function signOut() {
-    await supabase.auth.signOut()
+    profileRef.current = null
     setProfile(null)
     setSession(null)
-    profileRef.current = null
+    await supabase.auth.signOut()
   }
 
-  const value = {
-    session,
-    profile,
-    loading,
-    role:          profile?.role ?? null,
-    isAdmin:       profile?.role === 'admin',
-    isInstructor:  profile?.role === 'instructor' || profile?.role === 'admin',
-    isStudent:     !!profile,
-    signOut,
-    refreshProfile: () => session && fetchProfile(session.user.id),
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{
+      session,
+      profile,
+      loading,
+      role:         profile?.role ?? null,
+      isAdmin:      profile?.role === 'admin',
+      isInstructor: profile?.role === 'instructor' || profile?.role === 'admin',
+      isStudent:    !!profile,
+      signOut,
+      refreshProfile: () => {
+        if (session?.user?.id) {
+          profileRef.current = null
+          fetchProfile(session.user.id)
+        }
+      },
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {

@@ -7,4 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Check your .env.local file.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession:         true,   // store session in localStorage
+    autoRefreshToken:       true,   // silently refresh JWTs
+    detectSessionInUrl:     true,   // handle magic link / OAuth redirects
+    // Prevent the tab-to-tab broadcast that was triggering freezes.
+    // Each tab manages its own session state independently.
+    storageKey:             'vlc-auth',
+  },
+})

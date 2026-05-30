@@ -13,6 +13,8 @@ const TAB_GROUPS = [
       hero:         'Hero & Branding',
       pathway:      'Pathway Steps',
       publications: 'Articles & Marquee',
+      marquee:      'Module Spotlight',
+      events:       'Stay Locked In',
     }
   },
   {
@@ -40,6 +42,7 @@ export default function AdminPage() {
   const [editingPub,   setEditingPub]   = useState(null)   // pub row being edited
   const [newPub,       setNewPub]       = useState({ tag:'', title:'', url:'', active:true })
   const [showNewPub,   setShowNewPub]   = useState(false)
+  const [marqueeData,  setMarqueeData]  = useState(null)
   const [events,       setEvents]       = useState([])
   const [editingEvent, setEditingEvent] = useState(null)
   const [showNewEvent, setShowNewEvent] = useState(false)
@@ -59,7 +62,7 @@ export default function AdminPage() {
   async function loadAll() {
     const [
       { data: s }, { data: u }, { data: el },
-      { data: pc }, { data: pb }, { data: fv }, { data: crs }, { data: evs }
+      { data: pc }, { data: pb }, { data: fv }, { data: crs }, { data: evs }, { data: mq }
     ] = await Promise.all([
       supabase.from('home_settings').select('*').single(),
       supabase.from('profiles').select('*').order('full_name'),
@@ -68,6 +71,7 @@ export default function AdminPage() {
       supabase.from('home_publications').select('*').order('sort_order'),
       supabase.from('course_facilitators_view').select('*').order('facilitator_name'),
       supabase.from('home_events').select('*').order('sort_order'),
+      supabase.from('home_marquee').select('*').order('sort_order').limit(1).single(),
       supabase.from('courses').select('id,title,badge_label').eq('active', true).order('sort_order'),
     ])
     if (s)   setSettings(s)
@@ -78,6 +82,21 @@ export default function AdminPage() {
     if (fv)  setFacView(fv)
     if (crs) setCourses(crs)
     if (evs) setEvents(evs)
+    if (mq)  setMarqueeData(mq)
+  }
+
+  // ── MARQUEE / MODULE SPOTLIGHT ──
+  async function saveMarquee() {
+    if (!marqueeData) return
+    await supabase.from('home_marquee').update({
+      label:           marqueeData.label,
+      title:           marqueeData.title,
+      subtitle:        marqueeData.subtitle,
+      description:     marqueeData.description,
+      scripture_text:  marqueeData.scripture_text,
+      scripture_ref:   marqueeData.scripture_ref,
+    }).eq('id', marqueeData.id)
+    alert('Module spotlight saved ✓')
   }
 
   // ── EVENTS (Stay Locked In) ──
@@ -381,6 +400,46 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ── MODULE SPOTLIGHT ── */}
+        {tab === 'marquee' && marqueeData && (
+          <div className={`${styles.panel} fade-up`}>
+            <div className={styles.secTitle}>This Month's Module Spotlight</div>
+            <p style={{fontSize:13,color:'var(--grey-dark)',marginBottom:20,lineHeight:1.6}}>
+              This appears in the announcement banner at the top of the homepage and in the scripture bar below the hero.
+            </p>
+
+            <div className={styles.spotlightPreview}>
+              <div className={styles.spvLabel}>{marqueeData.label}</div>
+              <div className={styles.spvTitle}>{marqueeData.title}</div>
+              {marqueeData.subtitle && <div className={styles.spvSub}>{marqueeData.subtitle}</div>}
+            </div>
+
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginTop:20}}>
+              <Field label="Banner label (pill text)"     value={marqueeData.label}    onChange={v=>setMarqueeData(m=>({...m,label:v}))} />
+              <Field label="Module title"                  value={marqueeData.title}    onChange={v=>setMarqueeData(m=>({...m,title:v}))} />
+            </div>
+            <Field label="Subtitle (e.g. Module 4 of 8 — Discipleship Class)"
+              value={marqueeData.subtitle||''} onChange={v=>setMarqueeData(m=>({...m,subtitle:v}))} />
+            <Field label="Description (longer text for module detail)"
+              value={marqueeData.description||''} onChange={v=>setMarqueeData(m=>({...m,description:v}))} textarea />
+            <div style={{display:'grid',gridTemplateColumns:'3fr 1fr',gap:12}}>
+              <Field label="Scripture text"
+                value={marqueeData.scripture_text||''} onChange={v=>setMarqueeData(m=>({...m,scripture_text:v}))} textarea />
+              <Field label="Reference (e.g. 2 Timothy 2:15)"
+                value={marqueeData.scripture_ref||''} onChange={v=>setMarqueeData(m=>({...m,scripture_ref:v}))} />
+            </div>
+            <div className={styles.saveRow}>
+              <Button variant="ghost" onClick={loadAll}>Discard</Button>
+              <Button variant="blue" onClick={saveMarquee}>Save module spotlight</Button>
+            </div>
+          </div>
+        )}
+        {tab === 'marquee' && !marqueeData && (
+          <div className={`${styles.panel} fade-up`}>
+            <div className={styles.note}>No module spotlight found. Check home_marquee table in Supabase.</div>
           </div>
         )}
 

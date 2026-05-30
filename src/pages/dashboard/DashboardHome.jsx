@@ -158,7 +158,7 @@ export default function DashboardHome() {
         </div>
       )}
 
-      {/* ── STAT CHIPS (profile card style from reference) ── */}}
+      {/* ── STAT CHIPS (profile card style from reference) ── */}
       <div className={styles.profileCard}>
         <div className={styles.profileProgress}>
           <div className={styles.profileName}>{profile?.full_name}</div>
