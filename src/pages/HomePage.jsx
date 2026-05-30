@@ -238,9 +238,11 @@ export default function HomePage() {
                         { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', link_url:null },
                       ]
                   ).map(ev => {
-                    const Tag = ev.link_url ? 'a' : 'div'
-                    const linkProps = ev.link_url
-                      ? { href: ev.link_url, target:'_blank', rel:'noreferrer' }
+                    // Only use <a> when there is an actual URL — never href="#" or empty string
+                    const hasLink = ev.link_url && ev.link_url.trim().length > 0
+                    const Tag = hasLink ? 'a' : 'span'
+                    const linkProps = hasLink
+                      ? { href: ev.link_url.trim(), target:'_blank', rel:'noreferrer' }
                       : {}
                     return (
                       <Tag key={ev.id} className={styles.eventBubble} {...linkProps}>
@@ -341,14 +343,17 @@ export default function HomePage() {
           <div className={styles.fadeLeft} />
           <div className={styles.fadeRight} />
           <div className={styles.marqueeTrack} ref={marqueeTrackRef}>
-            {marqueeItems.map((a, i) => (
-              <a key={i} href={a.url ?? '#'} target={a.url ? '_blank' : '_self'}
-                rel="noreferrer" className={styles.marqueeItem}>
-                <span className={styles.mTag}>{a.tag}</span>
-                <span className={styles.mTitle}>{a.title}</span>
-                <span className={styles.mArrow}>→</span>
-              </a>
-            ))}
+            {marqueeItems.map((a, i) => {
+              const MTag = a.url ? 'a' : 'span'
+              const mProps = a.url ? { href: a.url, target:'_blank', rel:'noreferrer' } : {}
+              return (
+                <MTag key={i} {...mProps} className={styles.marqueeItem}>
+                  <span className={styles.mTag}>{a.tag}</span>
+                  <span className={styles.mTitle}>{a.title}</span>
+                  <span className={styles.mArrow}>→</span>
+                </MTag>
+              )
+            })}
           </div>
         </div>
       </div>
