@@ -230,25 +230,28 @@ export default function HomePage() {
               <div className={styles.staySection}>
                 <div className={styles.stayLabel}>Stay Locked In!</div>
                 <div className={styles.eventBubbles}>
-                  {(events.length > 0
+                {(events.length > 0
                     ? events
                     : [
-                        { id:1, title:'Bible Study',      day_time:'TUESDAY AT 7PM',   description:'Weekly gathering for scripture study, discussion, and applied teaching.' },
-                        { id:2, title:'Bible Foundation',  day_time:'SUNDAY AT 10AM',   description:'New members foundation class — exploring core beliefs and community covenant.' },
-                        { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', description:'Formation and mentorship session for youth at VOW Center.' },
+                        { id:1, title:'Bible Study',      day_time:'TUESDAY AT 7PM',   link_url:null },
+                        { id:2, title:'Bible Foundation',  day_time:'SUNDAY AT 10AM',   link_url:null },
+                        { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', link_url:null },
                       ]
-                  ).map(ev => (
-                    <div key={ev.id} className={styles.eventBubble}>
-                      <div className={styles.eventTop}>
-                        <span className={styles.eventTitle}>{ev.title}</span>
-                        <span className={styles.eventDot} />
-                        <span className={styles.eventTime}>{ev.day_time}</span>
-                      </div>
-                      {ev.description && (
-                        <div className={styles.eventDesc}>{ev.description}</div>
-                      )}
-                    </div>
-                  ))}
+                  ).map(ev => {
+                    const Tag = ev.link_url ? 'a' : 'div'
+                    const linkProps = ev.link_url
+                      ? { href: ev.link_url, target:'_blank', rel:'noreferrer' }
+                      : {}
+                    return (
+                      <Tag key={ev.id} className={styles.eventBubble} {...linkProps}>
+                        <div className={styles.eventTop}>
+                          <span className={styles.eventTitle}>{ev.title}</span>
+                          <span className={styles.eventDot} />
+                          <span className={styles.eventTime}>{ev.day_time}</span>
+                        </div>
+                      </Tag>
+                    )
+                  })}
                 </div>
               </div>
             )}

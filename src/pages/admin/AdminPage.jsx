@@ -46,7 +46,7 @@ export default function AdminPage() {
   const [events,       setEvents]       = useState([])
   const [editingEvent, setEditingEvent] = useState(null)
   const [showNewEvent, setShowNewEvent] = useState(false)
-  const [newEvent,     setNewEvent]     = useState({ title:'', day_time:'', description:'' })
+  const [newEvent,     setNewEvent]     = useState({ title:'', day_time:'', description:'', link_url:'' })
   const [facView,      setFacView]      = useState([])
   const [courses,      setCourses]      = useState([])
   const [assignUser,   setAssignUser]   = useState('')
@@ -102,7 +102,7 @@ export default function AdminPage() {
   // ── EVENTS (Stay Locked In) ──
   async function saveEvent(ev) {
     await supabase.from('home_events').update({
-      title: ev.title, day_time: ev.day_time, description: ev.description
+      title: ev.title, day_time: ev.day_time, description: ev.description, link_url: ev.link_url || null
     }).eq('id', ev.id)
     setEvents(prev => prev.map(e => e.id === ev.id ? ev : e))
     setEditingEvent(null)
@@ -110,7 +110,7 @@ export default function AdminPage() {
   async function addEvent() {
     if (!newEvent.title || !newEvent.day_time) { alert('Title and time are required.'); return }
     const { data, error } = await supabase.from('home_events')
-      .insert({ ...newEvent, sort_order: events.length + 1, active: true })
+      .insert({ ...newEvent, link_url: newEvent.link_url || null, sort_order: events.length + 1, active: true })
       .select().single()
     if (!error && data) {
       setEvents(e => [...e, data])
@@ -460,7 +460,10 @@ export default function AdminPage() {
                   <Field label="Event name (large text)" value={newEvent.title}    onChange={v=>setNewEvent(e=>({...e,title:v}))} />
                   <Field label="Day · Time (ALL CAPS)"   value={newEvent.day_time} onChange={v=>setNewEvent(e=>({...e,day_time:v.toUpperCase()}))} />
                 </div>
-                <Field label="Description (smaller text)" value={newEvent.description} onChange={v=>setNewEvent(e=>({...e,description:v}))} textarea />
+                <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                  <Field label="Description (optional)"  value={newEvent.description} onChange={v=>setNewEvent(e=>({...e,description:v}))} />
+                  <Field label="Link URL (optional — makes button clickable)" value={newEvent.link_url||''} onChange={v=>setNewEvent(e=>({...e,link_url:v}))} />
+                </div>
                 <Button variant="blue" size="sm" onClick={addEvent}>Add bubble</Button>
               </div>
             )}
@@ -475,7 +478,10 @@ export default function AdminPage() {
                         <Field label="Event name" value={editingEvent.title}    onChange={v=>setEditingEvent(e=>({...e,title:v}))} />
                         <Field label="Day · Time" value={editingEvent.day_time} onChange={v=>setEditingEvent(e=>({...e,day_time:v.toUpperCase()}))} />
                       </div>
-                      <Field label="Description" value={editingEvent.description||''} onChange={v=>setEditingEvent(e=>({...e,description:v}))} textarea />
+                      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                        <Field label="Description" value={editingEvent.description||''} onChange={v=>setEditingEvent(e=>({...e,description:v}))} />
+                        <Field label="Link URL (leave blank = no click)" value={editingEvent.link_url||''} onChange={v=>setEditingEvent(e=>({...e,link_url:v}))} />
+                      </div>
                       <div style={{display:'flex',gap:8,marginTop:8}}>
                         <Button variant="blue"  size="sm" onClick={()=>saveEvent(editingEvent)}>Save</Button>
                         <Button variant="ghost" size="sm" onClick={()=>setEditingEvent(null)}>Cancel</Button>
