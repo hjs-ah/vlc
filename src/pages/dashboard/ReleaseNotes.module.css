@@ -1,0 +1,18 @@
+.page { max-width: 680px; animation: fadeUp 0.2s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+.header { margin-bottom: 28px; }
+.tag  { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.h1   { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); margin-bottom: 6px; }
+.sub  { font-size: 14px; color: var(--grey-dark); line-height: 1.6; }
+.card {
+  background: #fff; border: 1px solid var(--grey-rule);
+  border-radius: var(--r); padding: 22px 24px; margin-bottom: 14px;
+}
+.noteHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.noteDate   { font-size: 12px; color: var(--grey-text); }
+.noteTitle  { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 10px; letter-spacing: -0.2px; }
+.noteBody   { font-size: 13.5px; color: var(--grey-dark); line-height: 1.7; }
+.noteBody p { margin-bottom: 8px; }
+.noteBody ul { padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.noteBody li { list-style: disc; }
+.empty { font-size: 14px; color: var(--grey-text); padding: 24px 0; }

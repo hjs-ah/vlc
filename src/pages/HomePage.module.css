@@ -9,7 +9,8 @@
   flex-direction: column;
   position: relative;
   overflow: visible;
-  min-height: calc(100vh - 400px);
+  min-height: 760px;
+  height: 760px;
 }
 .heroDots {
   position: absolute; inset: 0;
@@ -96,7 +97,7 @@
   align-items: flex-start;
   padding: 12px 14px 12px 16px;
   cursor: pointer;
-  background: rgba(255,255,255,0.55);
+  background: #fff;
   border: 1px solid rgba(255,255,255,0.8);
   border-radius: 6px;
   font-family: inherit;
@@ -172,7 +173,7 @@
 
 /* Hover and active states */
 .chevronItem:hover {
-  background: rgba(255,255,255,0.85);
+  background: #f8f8f8;
   transform: translateX(-3px);
   box-shadow: var(--sh-sm);
 }
@@ -784,4 +785,26 @@
   .eventBubble { max-width: 100%; }
   .eventBubble:nth-child(2), .eventBubble:nth-child(3) { margin-left: 0; }
   .announceInner { padding: 0 20px; }
+}
+
+/* ── STAY ROW — standalone white strip between hero and marquee ── */
+.stayRow {
+  background: #fff;
+  border-bottom: 1px solid var(--grey-rule);
+  padding: 24px 0;
+  position: relative;
+  z-index: 5;  /* above everything, no overlap issues */
+}
+.stayInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+/* Override staySection margin since it's now in its own row */
+.stayRow .staySection {
+  margin-top: 0 !important;
+  position: static !important;
+}
+@media (max-width: 900px) {
+  .stayInner { padding: 0 20px; }
 }

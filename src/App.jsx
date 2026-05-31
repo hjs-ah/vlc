@@ -8,6 +8,7 @@ import LoginPage     from '@/pages/LoginPage'
 import ExplorePage   from '@/pages/ExplorePage'
 import DashboardHome    from '@/pages/dashboard/DashboardHome'
 import InstructorTools from '@/pages/dashboard/InstructorTools'
+import ReleaseNotes   from '@/pages/dashboard/ReleaseNotes'
 import AdminPage     from '@/pages/admin/AdminPage'
 
 // Lazy stub pages — fill out progressively
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="grades"        element={<Stub name="Grades" />} />
             <Route path="discussions"   element={<Stub name="Discussions" />} />
             <Route path="schedule"       element={<Stub name="Schedule" />} />
+            <Route path="release"        element={<ReleaseNotes />} />
             <Route path="gradebook"     element={<Stub name="Grade Book" />} />
             <Route path="tools"         element={<InstructorTools />} />
           </Route>

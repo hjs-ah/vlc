@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/lib/AuthContext'
 import Sidebar from './Sidebar'
 import styles from './DashboardLayout.module.css'
 
@@ -11,7 +12,8 @@ const TITLES = {
   '/dashboard/discussions': 'Discussions',
   '/dashboard/gradebook':   'Grade book',
   '/dashboard/tools':       'Instructor Tools',
-  '/dashboard/schedule':     'Schedule',
+  '/dashboard/schedule':    'Schedule',
+  '/dashboard/release':     'Release Notes',
 }
 
 const BellIcon = () => (
@@ -25,11 +27,24 @@ const MenuIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
   </svg>
 )
+const LogoutIcon = () => (
+  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+)
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { pathname } = useLocation()
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const title = TITLES[pathname] ?? 'Dashboard'
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
 
   return (
     <div className={styles.shell}>
@@ -41,16 +56,22 @@ export default function DashboardLayout() {
             <MenuIcon />
           </button>
           <h1 className={styles.title}>{title}</h1>
-          <div className={styles.search}>
-            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--grey-mid)', flexShrink: 0 }}>
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            <input type="text" placeholder="Search..." />
+
+          {/* Right side actions */}
+          <div className={styles.topbarRight}>
+            <button className={styles.iconBtn}>
+              <BellIcon />
+              <span className={styles.notifDot} />
+            </button>
+            <button
+              className={styles.logoutBtn}
+              onClick={handleSignOut}
+              title="Sign out"
+            >
+              <LogoutIcon />
+              <span>Sign out</span>
+            </button>
           </div>
-          <button className={styles.iconBtn}>
-            <BellIcon />
-            <span className={styles.notifDot} />
-          </button>
         </header>
 
         <main className={styles.content}>
