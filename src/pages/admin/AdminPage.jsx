@@ -62,7 +62,7 @@ export default function AdminPage() {
   async function loadAll() {
     const [
       { data: s }, { data: u }, { data: el },
-      { data: pc }, { data: pb }, { data: fv }, { data: crs }, { data: evs }, { data: mq }
+      { data: pc }, { data: pb }, { data: fv }, { data: evs }, { data: mq }, { data: crs }
     ] = await Promise.all([
       supabase.from('home_settings').select('*').single(),
       supabase.from('profiles').select('*').order('full_name'),

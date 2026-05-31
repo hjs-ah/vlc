@@ -16,19 +16,15 @@ export default function Nav() {
     <nav className={styles.nav}>
       <div className={styles.inner}>
 
+        {/* LEFT — logo */}
         <Link to="/" className={styles.logo}>
           <img src="/vlc-logo-wide.jpg" alt="Verity Learning Center" className={styles.logoImg} />
         </Link>
 
-        {/* CENTER — nav links */}
-        <div className={styles.links}>
-          <Link to="/">Programs</Link>
-          <Link to="/explore">Explore</Link>
-          <Link to="/">About</Link>
-        </div>
-
-        {/* RIGHT — auth actions */}
+        {/* RIGHT — Explore link + auth */}
         <div className={styles.actions}>
+          <Link to="/explore" className={styles.exploreLink}>Explore</Link>
+
           {profile ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>

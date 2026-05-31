@@ -89,17 +89,19 @@ const CAROUSEL_SLIDES = [
     bg: 'var(--ink)',
     light: true,
     type: 'video',
+    link: null,
   },
   {
     id: 'signup',
     tag: 'Get Started',
     title: 'How to sign up and get access',
     desc: 'Access to Verity is invitation-only. Learn how to request access, what to expect after your first login, and how to navigate your dashboard.',
-    cta: 'Read guide',
+    cta: 'Explore →',
     ctaIcon: '📋',
     bg: 'var(--blue-l)',
     light: false,
     type: 'guide',
+    link: '/explore',
   },
   {
     id: 'articles',
@@ -111,6 +113,7 @@ const CAROUSEL_SLIDES = [
     bg: '#F4F1E8',
     light: false,
     type: 'articles',
+    link: '/explore',
   },
 ]
 
@@ -300,7 +303,7 @@ export default function HomePage() {
                       </span>
                     </>
                   )}
-                  {settings.hero_fg_person_url && i===displayStep && (
+                  {settings.hero_fg_person_url && settings.hero_fg_person_url.trim() !== '' && i===displayStep && (
                     <img src={settings.hero_fg_person_url} alt="" className={styles.frameFg} />
                   )}
                 </div>
@@ -394,7 +397,7 @@ export default function HomePage() {
                         <div className={styles.slideMiniTitle}>{sl.title}</div>
                         <p className={styles.slideMiniDesc}>{sl.desc}</p>
                         <button className={styles.slideMiniCta}
-                          onClick={() => navigate(sl.type === 'articles' ? '/explore' : '/login')}>
+                          onClick={() => navigate(sl.link ?? '/login')}>
                           {sl.ctaIcon} {sl.cta}
                         </button>
                       </div>
@@ -526,7 +529,7 @@ export default function HomePage() {
 
       <footer className={styles.footer}>
         <div className={styles.footerText}>
-          <span>Verity Learning Center · VOW Center</span>
+          <span>Verity Learning Center · <a href="https://vowcenter.com" target="_blank" rel="noreferrer" style={{color:'inherit',textDecoration:'underline',textUnderlineOffset:'3px'}}>VOW Center</a></span>
           <span className={styles.footerCopy}>© 2026 Verity Outreach Worship Center</span>
         </div>
       </footer>
