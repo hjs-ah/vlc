@@ -224,6 +224,36 @@ export default function HomePage() {
               <Button variant="outline" size="lg" onClick={() => navigate('/explore')}>Explore</Button>
             </div>
             <p className={styles.heroNote}>Access is granted by VOW Center leadership.</p>
+
+            {/* ── STAY LOCKED IN — inside heroLeft, overlaps city sketch ── */}
+            <div className={styles.staySection}>
+              <div className={styles.stayLabel}>Stay Locked In!</div>
+              <div className={styles.eventBubbles}>
+                {(events.length > 0
+                  ? events
+                  : [
+                      { id:1, title:'Bible Study',      day_time:'TUESDAY AT 7PM',   link_url:null },
+                      { id:2, title:'Bible Foundation',  day_time:'SUNDAY AT 10AM',   link_url:null },
+                      { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', link_url:null },
+                    ]
+                ).map(ev => {
+                  const hasLink = ev.link_url && ev.link_url.trim().length > 0
+                  const Tag = hasLink ? 'a' : 'span'
+                  const linkProps = hasLink
+                    ? { href: ev.link_url.trim(), target:'_blank', rel:'noreferrer' }
+                    : {}
+                  return (
+                    <Tag key={ev.id} className={styles.eventBubble} {...linkProps}>
+                      <div className={styles.eventTop}>
+                        <span className={styles.eventTitle}>{ev.title}</span>
+                        <span className={styles.eventDot} />
+                        <span className={styles.eventTime}>{ev.day_time}</span>
+                      </div>
+                    </Tag>
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
           {/* RIGHT — chevrons + graphic */}
@@ -296,40 +326,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── STAY LOCKED IN — outside hero, its own white row ── */}
-      <div className={styles.stayRow}>
-        <div className={styles.stayInner}>
-          <div className={styles.staySection}>
-            <div className={styles.stayLabel}>Stay Locked In!</div>
-            <div className={styles.eventBubbles}>
-              {(events.length > 0
-                ? events
-                : [
-                    { id:1, title:'Bible Study',      day_time:'TUESDAY AT 7PM',   link_url:null },
-                    { id:2, title:'Bible Foundation',  day_time:'SUNDAY AT 10AM',   link_url:null },
-                    { id:3, title:'Youth Foundation',  day_time:'FRIDAY AT 6:30PM', link_url:null },
-                  ]
-              ).map(ev => {
-                const hasLink = ev.link_url && ev.link_url.trim().length > 0
-                const Tag = hasLink ? 'a' : 'span'
-                const linkProps = hasLink
-                  ? { href: ev.link_url.trim(), target:'_blank', rel:'noreferrer' }
-                  : {}
-                return (
-                  <Tag key={ev.id} className={styles.eventBubble} {...linkProps}>
-                    <div className={styles.eventTop}>
-                      <span className={styles.eventTitle}>{ev.title}</span>
-                      <span className={styles.eventDot} />
-                      <span className={styles.eventTime}>{ev.day_time}</span>
-                    </div>
-                  </Tag>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ── MARQUEE BAR — dark grey, white text ── */}
       <div className={styles.marqueeBar}>
         <div className={styles.marqueeLbl}>
@@ -371,42 +367,92 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── COURSES ── */}
+      {/* ── SPLIT SECTION: Carousel left · Courses right ── */}
       <div className={styles.secWhite}>
         <div className={styles.secInner}>
-          <div className={styles.secRow}>
-            <div>
-              <div className={styles.secTag}>Programs</div>
-              <h2 className={styles.secH2}>Available learning tracks</h2>
-              <p className={styles.secSub}>Structured formation pathways for every stage of your journey with VOW Center.</p>
-            </div>
-            {settings.show_view_all && <Button variant="outline" size="sm">View all</Button>}
-          </div>
-          <div className={styles.courseGrid}>
-            {(courses.length ? courses : DEFAULT_PATHWAY.map((s, i) => ({
-              id: i, title: s.name, badge_label: s.name,
-              thumb_color_start: '#1a1a1a', thumb_color_end: '#444',
-            }))).map(c => (
-              <div key={c.id} className={styles.courseCard}>
-                <div
-                  className={styles.courseThumb}
-                  style={c.thumbnail_url
-                    ? { backgroundImage: `url(${c.thumbnail_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                    : { background: `linear-gradient(135deg, ${c.thumb_color_start ?? '#1a1a1a'}, ${c.thumb_color_end ?? '#444'})` }
-                  }
-                >
-                  <span className={styles.courseBadge}>{c.badge_label}</span>
+          <div className={styles.splitGrid}>
+
+            {/* LEFT 50%: Getting started carousel */}
+            <div className={styles.splitLeft}>
+              <div className={styles.secTag}>Getting started</div>
+              <h2 className={styles.secH2}>New here?</h2>
+              <div className={styles.carouselMini}>
+                <div className={styles.carouselMiniTrack}>
+                  {CAROUSEL_SLIDES.map((sl, i) => (
+                    <div
+                      key={sl.id}
+                      className={[styles.carouselMiniSlide, i === carouselIdx ? styles.slideMiniActive : ''].join(' ')}
+                      style={{ background: sl.bg }}
+                    >
+                      <div className={styles.slideMiniMedia}>
+                        {sl.type === 'video' && <div className={styles.playBtnSm}>▶</div>}
+                        {sl.type === 'guide' && <span className={styles.slideIconSm}>📋</span>}
+                        {sl.type === 'articles' && <span className={styles.slideIconSm}>✦</span>}
+                      </div>
+                      <div className={styles.slideMiniBody}>
+                        <div className={styles.slideTag}>{sl.tag}</div>
+                        <div className={styles.slideMiniTitle}>{sl.title}</div>
+                        <p className={styles.slideMiniDesc}>{sl.desc}</p>
+                        <button className={styles.slideMiniCta}
+                          onClick={() => navigate(sl.type === 'articles' ? '/explore' : '/login')}>
+                          {sl.ctaIcon} {sl.cta}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className={styles.courseBody}>
-                  <div className={styles.courseTitle}>{c.title}</div>
-                  <div className={styles.courseInst}>{c.description ?? 'VOW Center'}</div>
-                  <div className={styles.courseMeta}>
-                    {c.module_count > 0 && <span>{c.module_count} modules</span>}
-                    {c.duration_weeks && <span>{c.duration_weeks} weeks</span>}
+                <div className={styles.carouselMiniControls}>
+                  <button className={styles.carouselMiniArrow}
+                    onClick={() => setCarouselIdx(i => (i - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length)}>←</button>
+                  <div className={styles.carouselMiniDots}>
+                    {CAROUSEL_SLIDES.map((_, i) => (
+                      <button key={i}
+                        className={[styles.dot, i === carouselIdx ? styles.dotActive : ''].join(' ')}
+                        onClick={() => setCarouselIdx(i)} />
+                    ))}
                   </div>
+                  <button className={styles.carouselMiniArrow}
+                    onClick={() => setCarouselIdx(i => (i + 1) % CAROUSEL_SLIDES.length)}>→</button>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* RIGHT 50%: Available learning tracks */}
+            <div className={styles.splitRight}>
+              <div className={styles.secTag}>Programs</div>
+              <h2 className={styles.secH2}>Available tracks</h2>
+              <div className={styles.courseStack}>
+                {(courses.length
+                  ? courses.slice(0, 2)
+                  : DEFAULT_PATHWAY.slice(0, 2).map((s, i) => ({
+                      id: i, title: s.name, badge_label: s.name,
+                      thumb_color_start: '#1a1a1a', thumb_color_end: '#444',
+                    }))
+                ).map(c => (
+                  <div key={c.id} className={styles.courseCardRow}>
+                    <div
+                      className={styles.courseRowThumb}
+                      style={c.thumbnail_url
+                        ? { backgroundImage: `url(${c.thumbnail_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                        : { background: `linear-gradient(135deg, ${c.thumb_color_start ?? '#1a1a1a'}, ${c.thumb_color_end ?? '#444'})` }
+                      }
+                    />
+                    <div className={styles.courseRowBody}>
+                      <div className={styles.courseTitle}>{c.title}</div>
+                      <div className={styles.courseInst}>{c.description ?? 'VOW Center'}</div>
+                      {(c.module_count > 0 || c.duration_weeks) && (
+                        <div className={styles.courseMeta}>
+                          {c.module_count > 0 && <span>{c.module_count} modules</span>}
+                          {c.duration_weeks && <span>{c.duration_weeks} weeks</span>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {settings.show_view_all && <Button variant="outline" size="sm">View all tracks →</Button>}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -478,75 +524,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── BOTTOM CAROUSEL — Welcome video · Sign up guide · Read articles ── */}
-      <div className={styles.carouselSection}>
-        <div className={styles.carouselInner}>
-          <div className={styles.carouselHeader}>
-            <div className={styles.secTag} style={{ color:'rgba(255,255,255,0.5)' }}>Getting started</div>
-            <h2 className={styles.carouselH2}>New here? Start with these</h2>
-          </div>
-
-          <div className={styles.carouselStage}>
-            {/* Slide panels */}
-            <div className={styles.carouselTrack}>
-              {CAROUSEL_SLIDES.map((sl, i) => (
-                <div
-                  key={sl.id}
-                  className={[styles.carouselSlide, i === carouselIdx ? styles.slideActive : ''].join(' ')}
-                  style={{ background: sl.bg }}
-                >
-                  {/* Video placeholder or icon */}
-                  <div className={[styles.slideMedia, sl.light ? styles.slideMediaLight : ''].join(' ')}>
-                    {sl.type === 'video' && (
-                      <div className={styles.playBtn}>
-                        <span>▶</span>
-                      </div>
-                    )}
-                    {sl.type === 'guide' && <span className={styles.slideIcon}>📋</span>}
-                    {sl.type === 'articles' && <span className={styles.slideIcon}>✦</span>}
-                  </div>
-                  <div className={[styles.slideBody, sl.light ? styles.slideBodyLight : ''].join(' ')}>
-                    <div className={styles.slideTag}>{sl.tag}</div>
-                    <div className={styles.slideTitle}>{sl.title}</div>
-                    <p className={styles.slideDesc}>{sl.desc}</p>
-                    <button className={[styles.slideCta, sl.light ? styles.slideCtaLight : ''].join(' ')}
-                      onClick={() => navigate(sl.type === 'articles' ? '/explore' : '/login')}>
-                      {sl.ctaIcon} {sl.cta}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Dots + arrows */}
-            <div className={styles.carouselControls}>
-              <button className={styles.carouselArrow}
-                onClick={() => setCarouselIdx(i => (i - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length)}>
-                ←
-              </button>
-              <div className={styles.carouselDots}>
-                {CAROUSEL_SLIDES.map((_, i) => (
-                  <button
-                    key={i}
-                    className={[styles.dot, i === carouselIdx ? styles.dotActive : ''].join(' ')}
-                    onClick={() => setCarouselIdx(i)}
-                  />
-                ))}
-              </div>
-              <button className={styles.carouselArrow}
-                onClick={() => setCarouselIdx(i => (i + 1) % CAROUSEL_SLIDES.length)}>
-                →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <footer className={styles.footer}>
-        <div className={styles.footerLogo}>
-          <img src="/vlc-logo.jpg" alt="Verity Learning Center" className={styles.footerLogoImg} />
+        <div className={styles.footerText}>
+          <span>Verity Learning Center · VOW Center</span>
+          <span className={styles.footerCopy}>© 2026 Verity Outreach Worship Center</span>
         </div>
-        <span className={styles.footerCopy}>© 2026 Verity Outreach Worship Center</span>
       </footer>
     </div>
   )

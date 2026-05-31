@@ -9,8 +9,7 @@
   flex-direction: column;
   position: relative;
   overflow: visible;
-  min-height: 760px;
-  height: 760px;
+  min-height: 700px;
 }
 .heroDots {
   position: absolute; inset: 0;
@@ -155,21 +154,7 @@
   padding: 12px 14px 12px 16px;
   border-radius: 6px 2px 2px 6px;
 }
-.chevronNotched::before {
-  content: '';
-  position: absolute;
-  right: -6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0; height: 0;
-  border-top: 18px solid transparent;
-  border-bottom: 18px solid transparent;
-  border-left: 6px solid rgba(255,255,255,0.55);
-  z-index: 1;
-  transition: border-left-color 0.2s;
-}
 .chevronNotched::after { right: -14px; }
-.chevronNotched.chevronActive::before { border-left-color: #fff !important; }
 
 /* Hover and active states */
 .chevronItem:hover {
@@ -377,10 +362,10 @@
 .toolCta   { font-size: 12.5px; font-weight: 600; }
 
 /* Footer */
-.footer { background: var(--ink); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.footerLogo { display: flex; align-items: center; }
-.footerLogoImg { height: 32px; width: auto; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.6; border-radius: 3px; }
-.footerCopy { font-size: 12px; color: rgba(255,255,255,0.25); }
+.footer { background: var(--ink); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footerText { display: flex; flex-direction: column; gap: 3px; }
+.footerText span { font-size: 12.5px; color: rgba(255,255,255,0.45); }
+.footerCopy { font-size: 11px !important; color: rgba(255,255,255,0.25) !important; }
 
 /* ══ RESPONSIVE ══ */
 @media (max-width: 960px) {
@@ -787,24 +772,92 @@
   .announceInner { padding: 0 20px; }
 }
 
-/* ── STAY ROW — standalone white strip between hero and marquee ── */
-.stayRow {
-  background: #fff;
-  border-bottom: 1px solid var(--grey-rule);
-  padding: 24px 0;
+
+/* ── SPLIT SECTION: Carousel 50% + Courses 50% ── */
+.splitGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.splitLeft  { display: flex; flex-direction: column; gap: 20px; }
+.splitRight { display: flex; flex-direction: column; gap: 20px; }
+
+/* Mini carousel */
+.carouselMini { position: relative; }
+.carouselMiniTrack {
   position: relative;
-  z-index: 5;  /* above everything, no overlap issues */
+  height: 240px;
+  border-radius: var(--r);
+  overflow: hidden;
 }
-.stayInner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 48px;
+.carouselMiniSlide {
+  position: absolute; inset: 0;
+  display: flex; align-items: stretch;
+  opacity: 0; transform: translateX(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none; border-radius: var(--r); overflow: hidden;
 }
-/* Override staySection margin since it's now in its own row */
-.stayRow .staySection {
-  margin-top: 0 !important;
-  position: static !important;
+.slideMiniActive { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.slideMiniMedia {
+  width: 110px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.15);
 }
+.playBtnSm {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff; cursor: pointer; padding-left: 2px;
+  transition: all 0.2s;
+}
+.playBtnSm:hover { background: rgba(255,255,255,0.3); }
+.slideIconSm { font-size: 32px; opacity: 0.5; }
+.slideMiniBody {
+  flex: 1; padding: 20px; display: flex; flex-direction: column;
+  justify-content: center; gap: 7px;
+}
+.slideMiniTitle { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; line-height: 1.3; }
+.slideMiniDesc  { font-size: 12.5px; color: var(--grey-dark); line-height: 1.55; }
+.slideMiniCta {
+  margin-top: 4px; padding: 7px 14px; border-radius: var(--rs);
+  font-size: 12.5px; font-weight: 600;
+  background: var(--ink); color: #fff;
+  border: none; cursor: pointer; font-family: inherit;
+  align-self: flex-start; transition: background 0.15s;
+}
+.slideMiniCta:hover { background: #333; }
+.carouselMiniControls {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin-top: 12px;
+}
+.carouselMiniArrow {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--grey-rule); background: none;
+  color: var(--grey-dark); font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit; transition: all 0.15s;
+}
+.carouselMiniArrow:hover { background: var(--grey-bg); border-color: var(--grey-mid); color: var(--ink); }
+
+/* Course stack (right col — horizontal rows) */
+.courseStack { display: flex; flex-direction: column; gap: 12px; }
+.courseCardRow {
+  display: flex; align-items: center; gap: 14px;
+  background: transparent; border: 1px solid var(--grey-rule);
+  border-radius: var(--r); overflow: hidden; cursor: pointer;
+  transition: box-shadow 0.25s, border-color 0.25s, background 0.25s, transform 0.25s;
+}
+.courseCardRow:hover {
+  background: #fff; border-color: var(--grey-mid);
+  box-shadow: var(--sh); transform: scale(1.02);
+}
+.courseRowThumb {
+  width: 80px; height: 80px; flex-shrink: 0;
+  background: var(--grey-bg);
+}
+.courseRowBody { padding: 10px 14px 10px 0; flex: 1; }
+
 @media (max-width: 900px) {
-  .stayInner { padding: 0 20px; }
+  .splitGrid { grid-template-columns: 1fr; gap: 32px; }
 }
