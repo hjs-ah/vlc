@@ -1,4 +1,8 @@
-.page { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+.page { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; min-height: 0; }
+/* Note: DashboardLayout removes the 28px content padding for this page,
+   so 56px (topbar only) is the correct offset. The tab bar and frame header
+   are flex children that take their natural height, and the iframe gets flex:1
+   to fill whatever remains — works on any screen size without a fixed offset. */
 
 /* ── TAB BAR ── */
 .tabBar {
@@ -8,7 +12,7 @@
   background: #fff;
   border-bottom: 1px solid var(--grey-rule);
   padding: 0 4px;
-  flex-shrink: 0;
+  flex-shrink: 0;  /* tab bar never shrinks — always fully visible */
   overflow-x: auto;
 }
 .tab {

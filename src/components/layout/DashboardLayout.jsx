@@ -76,7 +76,10 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className={styles.content}>
+        {/* Remove padding for full-bleed iframe pages */}
+        <main className={styles.content} style={
+          pathname === '/dashboard/tools' ? { padding: 0, overflow: 'hidden' } : {}
+        }>
           <Outlet />
         </main>
       </div>
