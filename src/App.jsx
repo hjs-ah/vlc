@@ -11,10 +11,29 @@ import InstructorTools from '@/pages/dashboard/InstructorTools'
 import ReleaseNotes   from '@/pages/dashboard/ReleaseNotes'
 import AdminPage     from '@/pages/admin/AdminPage'
 
-// Lazy stub pages — fill out progressively
+// Coming Soon stub — shown for pages not yet built
 const Stub = ({ name }) => (
-  <div style={{ padding: 32, color: 'var(--grey-dark)', fontSize: 14 }}>
-    <strong>{name}</strong> — coming in v0.2.0
+  <div style={{
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', minHeight: '60vh', gap: 14, textAlign: 'center',
+    padding: 32,
+  }}>
+    <div style={{ fontSize: 40 }}>🚧</div>
+    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.4px' }}>
+      {name}
+    </div>
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 7,
+      background: 'var(--orange-l)', border: '1px solid var(--orange-b)',
+      borderRadius: 20, padding: '6px 16px',
+      fontSize: 12, fontWeight: 700, color: 'var(--orange)',
+      letterSpacing: '0.5px', textTransform: 'uppercase',
+    }}>
+      Coming soon
+    </div>
+    <p style={{ fontSize: 13.5, color: 'var(--grey-text)', maxWidth: 320, lineHeight: 1.65, marginTop: 4 }}>
+      This section is being built out. Check back soon — or see Release Notes for the latest updates.
+    </p>
   </div>
 )
 

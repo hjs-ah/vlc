@@ -78,6 +78,19 @@ const STEP_META = [
 const CHEVRON_SHAPES = ['chevronClassic','chevronWide','chevronSharp','chevronNotched']
 
 // Carousel slides
+// ─────────────────────────────────────────────────────
+// CAROUSEL SLIDES — edit content here directly
+// Fields per slide:
+//   id        — unique key (don't change)
+//   tag       — small label above title (e.g. "Welcome")
+//   title     — bold heading
+//   desc      — paragraph text
+//   cta       — button label
+//   ctaIcon   — emoji before button label
+//   bg        — background color (hex or CSS var)
+//   type      — 'video' | 'guide' | 'articles' (controls icon shown)
+//   link      — where CTA navigates ('/explore', '/login', null)
+// ─────────────────────────────────────────────────────
 const CAROUSEL_SLIDES = [
   {
     id: 'welcome',
@@ -86,8 +99,8 @@ const CAROUSEL_SLIDES = [
     desc: 'A brief introduction to who we are, what we believe, and how this platform supports your formation journey at VOW Center.',
     cta: 'Watch intro',
     ctaIcon: '▶',
-    bg: 'var(--ink)',
-    light: true,
+    bg: '#DEDEDE',   /* ← edit this hex to change the slide background */
+    light: false,
     type: 'video',
     link: null,
   },

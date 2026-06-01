@@ -35,7 +35,8 @@ const LogoutIcon = () => (
 )
 
 export default function DashboardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen,     setSidebarOpen]     = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const { pathname } = useLocation()
   const { signOut } = useAuth()
   const navigate = useNavigate()
@@ -46,28 +47,29 @@ export default function DashboardLayout() {
     navigate('/')
   }
 
+  const sidebarW = sidebarCollapsed ? 60 : 240
+
   return (
     <div className={styles.shell}>
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
+      />
 
-      <div className={styles.main}>
+      <div className={styles.main} style={{ marginLeft: sidebarW }}>
         <header className={styles.topbar}>
           <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)}>
             <MenuIcon />
           </button>
           <h1 className={styles.title}>{title}</h1>
-
-          {/* Right side actions */}
           <div className={styles.topbarRight}>
             <button className={styles.iconBtn}>
               <BellIcon />
               <span className={styles.notifDot} />
             </button>
-            <button
-              className={styles.logoutBtn}
-              onClick={handleSignOut}
-              title="Sign out"
-            >
+            <button className={styles.logoutBtn} onClick={handleSignOut} title="Sign out">
               <LogoutIcon />
               <span>Sign out</span>
             </button>

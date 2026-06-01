@@ -359,3 +359,40 @@
   border-color: rgba(255,255,255,0.4);
   color: #fff;
 }
+
+/* ── QUICK NAV CARDS ── */
+.quickNav {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.quickNavBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  border-radius: var(--r);
+  border: 1px solid;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+}
+.quickNavBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh);
+  filter: brightness(0.97);
+}
+.quickNavIcon {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--grey-dark);
+}
+.quickNavLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.2;
+}

@@ -13,10 +13,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     mountedRef.current = true
+    let sessionHandled = false  // prevents double-fetch when both getSession + SIGNED_IN fire
 
     // 1. Grab current session — this is the only thing that matters on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mountedRef.current) return
+      sessionHandled = true
       setSession(session)
       if (session?.user?.id) {
         fetchProfile(session.user.id)
@@ -25,16 +27,17 @@ export function AuthProvider({ children }) {
       }
     })
 
-    // 2. Listen for auth changes — but be very selective about what triggers a re-fetch
+    // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mountedRef.current) return
 
-        // TOKEN_REFRESHED: silent — session is still valid, profile unchanged
+        // TOKEN_REFRESHED: silent — profile unchanged
         if (event === 'TOKEN_REFRESHED') return
 
         // SIGNED_OUT: clear everything
         if (event === 'SIGNED_OUT' || !session) {
+          sessionHandled = false
           setSession(null)
           setProfile(null)
           profileRef.current = null
@@ -42,7 +45,13 @@ export function AuthProvider({ children }) {
           return
         }
 
-        // SIGNED_IN / USER_UPDATED: only re-fetch if user changed
+        // SIGNED_IN: skip if getSession() already handled this user
+        // This prevents the double-fetch race on cold page load
+        if (event === 'SIGNED_IN') {
+          if (sessionHandled && profileRef.current?.id === session.user.id) return
+        }
+
+        // Only re-fetch if user actually changed
         if (session?.user?.id && session.user.id !== profileRef.current?.id) {
           setSession(session)
           fetchProfile(session.user.id)

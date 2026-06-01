@@ -87,3 +87,35 @@
   .sidebar.open { transform: translateX(0); }
   .backdrop  { display: block; }
 }
+
+/* ── COLLAPSED STATE ── */
+.collapsed {
+  width: 60px;
+}
+.collapsed .logo {
+  padding: 12px 8px;
+  justify-content: center;
+}
+.logoMark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; cursor: pointer;
+  flex-shrink: 0;
+}
+.collapseBtn {
+  margin-left: auto;
+  width: 24px; height: 24px;
+  border-radius: 6px; border: none;
+  background: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--grey-mid); transition: all 0.15s;
+  flex-shrink: 0;
+}
+.collapseBtn:hover { background: var(--grey-bg); color: var(--ink); }
+.collapsed .collapseBtn { margin-left: 0; margin-top: 6px; }
+.navItemCollapsed {
+  justify-content: center;
+  padding: 10px;
+}
+.navItemCollapsed .navIcon { width: 18px; height: 18px; }
