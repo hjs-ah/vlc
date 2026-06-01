@@ -9,11 +9,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession:         true,   // store session in localStorage
-    autoRefreshToken:       true,   // silently refresh JWTs
-    detectSessionInUrl:     true,   // handle magic link / OAuth redirects
-    // Prevent the tab-to-tab broadcast that was triggering freezes.
-    // Each tab manages its own session state independently.
-    storageKey:             'vlc-auth',
+    persistSession:     true,
+    autoRefreshToken:   true,
+    detectSessionInUrl: true,
+    // Unique storage key scoped to this app — prevents the DCW iframe
+    // (which also uses this Supabase project) from interfering with
+    // VLC's auth state in localStorage
+    storageKey: 'vlc-main-auth-v2',
+    // Use sessionStorage for the iframe context check
+    // (the DCW app runs in an iframe and should NOT share our token)
+    storage: window.self === window.top ? window.localStorage : {
+      getItem:    () => null,
+      setItem:    () => {},
+      removeItem: () => {},
+    },
   },
 })

@@ -35,8 +35,19 @@ export function AuthProvider({ children }) {
         // TOKEN_REFRESHED: silent — profile unchanged
         if (event === 'TOKEN_REFRESHED') return
 
-        // SIGNED_OUT: clear everything
-        if (event === 'SIGNED_OUT' || !session) {
+        // TOKEN_REFRESH_FAILED: session expired — clear and redirect to login
+        // This is what causes the "occasional second login" — handle it cleanly
+        if (event === 'TOKEN_REFRESH_FAILED' || event === 'SIGNED_OUT') {
+          sessionHandled = false
+          setSession(null)
+          setProfile(null)
+          profileRef.current = null
+          setLoading(false)
+          return
+        }
+
+        // Legacy SIGNED_OUT catch
+        if (!session) {
           sessionHandled = false
           setSession(null)
           setProfile(null)
