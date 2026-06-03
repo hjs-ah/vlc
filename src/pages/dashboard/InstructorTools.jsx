@@ -41,13 +41,15 @@ export default function InstructorTools() {
     }))
   ).sort((a, b) => a.sort_order - b.sort_order)
 
-  // Build iframe URL — pass user identity via query params for cross-origin apps
+  // Build iframe URL — pass user identity via query params for VLC apps.
+  // Skip for third-party URLs (Notion, etc.) where params are irrelevant.
   function buildToolUrl(tool) {
     if (!tool.tool_url || tool.tool_url === 'about:blank') return null
     try {
       const url = new URL(tool.tool_url)
-      if (profile) {
-        // Pass name + initials so the discipleship app can display who's logged in
+      // Only inject VLC user params for our own Vercel apps
+      const isVlcApp = url.hostname.endsWith('vercel.app')
+      if (profile && isVlcApp) {
         url.searchParams.set('vlc_user',     profile.full_name ?? '')
         url.searchParams.set('vlc_initials', getInitials(profile.full_name))
         url.searchParams.set('vlc_email',    profile.email ?? '')
