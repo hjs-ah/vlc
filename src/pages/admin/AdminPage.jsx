@@ -22,6 +22,7 @@ const TAB_GROUPS = [
     tabs: {
       users:        'Users & Access',
       facilitators: 'Facilitators',
+      resources:    'Teaching Resources',
       email:        'Email List',
     }
   },
@@ -49,6 +50,13 @@ export default function AdminPage() {
   const [newEvent,     setNewEvent]     = useState({ title:'', day_time:'', description:'', link_url:'' })
   const [facView,      setFacView]      = useState([])
   const [courses,      setCourses]      = useState([])
+  const [resources,    setResources]    = useState([])
+  const [editingRes,   setEditingRes]   = useState(null)
+  const [showNewRes,   setShowNewRes]   = useState(false)
+  const [newRes,       setNewRes]       = useState({
+    title:'', description:'', url:'', icon:'📋', icon_bg:'var(--grey-bg)',
+    category:'Teaching', cta_label:'Open', open_in_new_tab:true,
+  })
   const [assignUser,   setAssignUser]   = useState('')
   const [assignCourse, setAssignCourse] = useState('')
   const [assignRole,   setAssignRole]   = useState('instructor')
@@ -62,7 +70,7 @@ export default function AdminPage() {
   async function loadAll() {
     const [
       { data: s }, { data: u }, { data: el },
-      { data: pc }, { data: pb }, { data: fv }, { data: evs }, { data: mq }, { data: crs }
+      { data: pc }, { data: pb }, { data: fv }, { data: evs }, { data: mq }, { data: crs }, { data: ir }
     ] = await Promise.all([
       supabase.from('home_settings').select('*').single(),
       supabase.from('profiles').select('*').order('full_name'),
@@ -73,6 +81,7 @@ export default function AdminPage() {
       supabase.from('home_events').select('*').order('sort_order'),
       supabase.from('home_marquee').select('*').order('sort_order').limit(1).single(),
       supabase.from('courses').select('id,title,badge_label').eq('active', true).order('sort_order'),
+      supabase.from('instructor_resources').select('*').order('sort_order'),
     ])
     if (s)   setSettings(s)
     if (u)   setUsers(u)
@@ -83,6 +92,7 @@ export default function AdminPage() {
     if (crs) setCourses(crs)
     if (evs) setEvents(evs)
     if (mq)  setMarqueeData(mq)
+    if (ir)  setResources(ir)
   }
 
   // ── MARQUEE / MODULE SPOTLIGHT ──
@@ -128,7 +138,53 @@ export default function AdminPage() {
     setEvents(prev => prev.map(e => e.id === id ? {...e, active: !active} : e))
   }
 
-  // ── HERO ──
+  // ── INSTRUCTOR RESOURCES (Teaching Resources tab on Instructor Tools page) ──
+  async function saveRes(r) {
+    await supabase.from('instructor_resources').update({
+      title: r.title, description: r.description, url: r.url || null,
+      icon: r.icon, icon_bg: r.icon_bg, category: r.category,
+      cta_label: r.cta_label, open_in_new_tab: r.open_in_new_tab,
+    }).eq('id', r.id)
+    setResources(prev => prev.map(x => x.id === r.id ? r : x))
+    setEditingRes(null)
+  }
+  async function addRes() {
+    if (!newRes.title) { alert('Title is required.'); return }
+    const { data, error } = await supabase.from('instructor_resources')
+      .insert({ ...newRes, url: newRes.url || null, sort_order: resources.length })
+      .select().single()
+    if (!error && data) {
+      setResources(r => [...r, data])
+      setNewRes({ title:'', description:'', url:'', icon:'📋', icon_bg:'var(--grey-bg)', category:'Teaching', cta_label:'Open', open_in_new_tab:true })
+      setShowNewRes(false)
+    } else if (error) {
+      alert('Error: ' + error.message)
+    }
+  }
+  async function deleteRes(id) {
+    if (!confirm('Remove this resource card?')) return
+    await supabase.from('instructor_resources').delete().eq('id', id)
+    setResources(r => r.filter(x => x.id !== id))
+  }
+  async function toggleRes(id, active) {
+    await supabase.from('instructor_resources').update({ active: !active }).eq('id', id)
+    setResources(prev => prev.map(r => r.id === id ? {...r, active: !active} : r))
+  }
+  async function moveRes(id, dir) {
+    const idx = resources.findIndex(r => r.id === id)
+    const swapIdx = idx + dir
+    if (swapIdx < 0 || swapIdx >= resources.length) return
+    const a = resources[idx], b = resources[swapIdx]
+    await Promise.all([
+      supabase.from('instructor_resources').update({ sort_order: b.sort_order }).eq('id', a.id),
+      supabase.from('instructor_resources').update({ sort_order: a.sort_order }).eq('id', b.id),
+    ])
+    const next = [...resources]
+    ;[next[idx], next[swapIdx]] = [{...b, sort_order:a.sort_order}, {...a, sort_order:b.sort_order}]
+    setResources(next)
+  }
+
+
   async function saveSettings() {
     if (!settings) return
     setSaving(true)
@@ -642,7 +698,118 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── EMAIL LIST ── */}
+        {/* ── TEACHING RESOURCES (Instructor Tools page) ── */}
+        {tab === 'resources' && (
+          <div className={`${styles.panel} fade-up`}>
+            <div className={styles.secTitle} style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span>Teaching Resources — Instructor Tools cards</span>
+              <Button variant="blue" size="sm" onClick={() => setShowNewRes(v=>!v)}>
+                {showNewRes ? 'Cancel' : '+ Add resource'}
+              </Button>
+            </div>
+
+            {showNewRes && (
+              <div className={styles.facAssignCard} style={{marginBottom:20}}>
+                <div className={styles.facAssignTitle}>New resource card</div>
+                <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                  <Field label="Title" value={newRes.title} onChange={v=>setNewRes(r=>({...r,title:v}))} />
+                  <Field label="Category" value={newRes.category} onChange={v=>setNewRes(r=>({...r,category:v}))} />
+                </div>
+                <Field label="Description" textarea value={newRes.description} onChange={v=>setNewRes(r=>({...r,description:v}))} />
+                <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                  <Field label="Link URL (leave blank for 'Coming soon')" value={newRes.url} onChange={v=>setNewRes(r=>({...r,url:v}))} />
+                  <Field label="Button label" value={newRes.cta_label} onChange={v=>setNewRes(r=>({...r,cta_label:v}))} />
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:12}}>
+                  <Field label="Icon (emoji)" value={newRes.icon} onChange={v=>setNewRes(r=>({...r,icon:v}))} />
+                  <Field label="Icon background (CSS color/var)" value={newRes.icon_bg} onChange={v=>setNewRes(r=>({...r,icon_bg:v}))} />
+                  <div style={{marginBottom:14}}>
+                    <label style={{display:'block',fontSize:11.5,fontWeight:600,color:'var(--grey-dark)',marginBottom:5}}>Open in new tab</label>
+                    <button
+                      className={`badge ${newRes.open_in_new_tab?'badge-green':'badge-grey'}`}
+                      style={{cursor:'pointer'}}
+                      onClick={()=>setNewRes(r=>({...r,open_in_new_tab:!r.open_in_new_tab}))}
+                    >
+                      {newRes.open_in_new_tab ? 'Yes' : 'No'}
+                    </button>
+                  </div>
+                </div>
+                <Button variant="blue" size="sm" onClick={addRes}>Add resource</Button>
+              </div>
+            )}
+
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {resources.length === 0 && <div className={styles.note}>No resources yet.</div>}
+              {resources.map((r, i) => (
+                <div key={r.id} className={styles.pubRow}>
+                  {editingRes?.id === r.id ? (
+                    <div className={styles.pubEditForm}>
+                      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                        <Field label="Title" value={editingRes.title} onChange={v=>setEditingRes(x=>({...x,title:v}))} />
+                        <Field label="Category" value={editingRes.category} onChange={v=>setEditingRes(x=>({...x,category:v}))} />
+                      </div>
+                      <Field label="Description" textarea value={editingRes.description||''} onChange={v=>setEditingRes(x=>({...x,description:v}))} />
+                      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12,marginBottom:12}}>
+                        <Field label="Link URL" value={editingRes.url||''} onChange={v=>setEditingRes(x=>({...x,url:v}))} />
+                        <Field label="Button label" value={editingRes.cta_label||''} onChange={v=>setEditingRes(x=>({...x,cta_label:v}))} />
+                      </div>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:12}}>
+                        <Field label="Icon (emoji)" value={editingRes.icon} onChange={v=>setEditingRes(x=>({...x,icon:v}))} />
+                        <Field label="Icon background" value={editingRes.icon_bg} onChange={v=>setEditingRes(x=>({...x,icon_bg:v}))} />
+                        <div style={{marginBottom:14}}>
+                          <label style={{display:'block',fontSize:11.5,fontWeight:600,color:'var(--grey-dark)',marginBottom:5}}>Open in new tab</label>
+                          <button
+                            className={`badge ${editingRes.open_in_new_tab?'badge-green':'badge-grey'}`}
+                            style={{cursor:'pointer'}}
+                            onClick={()=>setEditingRes(x=>({...x,open_in_new_tab:!x.open_in_new_tab}))}
+                          >
+                            {editingRes.open_in_new_tab ? 'Yes' : 'No'}
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{display:'flex',gap:8,marginTop:8}}>
+                        <Button variant="blue"  size="sm" onClick={()=>saveRes(editingRes)}>Save</Button>
+                        <Button variant="ghost" size="sm" onClick={()=>setEditingRes(null)}>Cancel</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ width:36, height:36, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:17, flexShrink:0, background: r.icon_bg }}>
+                        {r.icon}
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:14,fontWeight:700,color:'var(--ink)'}}>{r.title}</div>
+                        <div style={{fontSize:11,fontWeight:700,letterSpacing:'0.4px',color:'var(--grey-text)',marginTop:2,textTransform:'uppercase'}}>{r.category}</div>
+                        {r.description && <div style={{fontSize:12,color:'var(--grey-dark)',marginTop:3}}>{r.description}</div>}
+                        {r.url && <div style={{fontSize:11.5,color:'var(--blue)',marginTop:3,wordBreak:'break-all'}}>{r.url}</div>}
+                      </div>
+                      <div style={{display:'flex',gap:6,flexShrink:0,alignItems:'center'}}>
+                        <button className={styles.facRemoveBtn} style={{opacity: i===0?0.3:1}} disabled={i===0} onClick={()=>moveRes(r.id,-1)}>↑</button>
+                        <button className={styles.facRemoveBtn} style={{opacity: i===resources.length-1?0.3:1}} disabled={i===resources.length-1} onClick={()=>moveRes(r.id,1)}>↓</button>
+                        <button
+                          className={`badge ${r.active?'badge-green':'badge-grey'}`}
+                          style={{cursor:'pointer'}}
+                          onClick={()=>toggleRes(r.id, r.active)}
+                        >
+                          {r.active?'Visible':'Hidden'}
+                        </button>
+                        <Button variant="ghost"  size="sm" onClick={()=>setEditingRes({...r})}>Edit</Button>
+                        <Button variant="danger" size="sm" onClick={()=>deleteRes(r.id)}>✕</Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className={styles.note} style={{marginTop:12}}>
+              These cards appear under "Teaching resources" on the Instructor Tools page (visible to instructors and admins).
+              Leave the link URL blank to show a "Coming soon" state. Icon background accepts any CSS color or
+              theme variable (e.g. <code>var(--blue-l)</code>, <code>var(--orange-l)</code>, <code>var(--grey-bg)</code>).
+            </p>
+          </div>
+        )}
+
+
         {tab === 'email' && (
           <div className={`${styles.panel} fade-up`}>
             <div className={styles.secTitle}>Share Content — email list</div>

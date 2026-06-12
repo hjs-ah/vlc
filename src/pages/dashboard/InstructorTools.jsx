@@ -6,6 +6,7 @@ import styles from './InstructorTools.module.css'
 export default function InstructorTools() {
   const { profile } = useAuth()
   const [myCourses,     setMyCourses]     = useState([])
+  const [resources,     setResources]     = useState([])
   const [activeTool,    setActiveTool]    = useState(null)
   const [activeTab,     setActiveTab]     = useState('tools')
   const [loading,       setLoading]       = useState(true)
@@ -14,19 +15,27 @@ export default function InstructorTools() {
   useEffect(() => {
     if (!profile) return
     async function load() {
-      const { data } = await supabase
-        .from('course_facilitators')
-        .select(`
-          role,
-          courses (
-            id, title, badge_label,
-            thumb_color_start, thumb_color_end, thumbnail_url,
-            course_tools ( id, label, short_label, tool_url, icon, sort_order )
-          )
-        `)
-        .eq('facilitator_id', profile.id)
-        .eq('active', true)
-      if (data) setMyCourses(data)
+      const [{ data: cf }, { data: ir }] = await Promise.all([
+        supabase
+          .from('course_facilitators')
+          .select(`
+            role,
+            courses (
+              id, title, badge_label,
+              thumb_color_start, thumb_color_end, thumbnail_url,
+              course_tools ( id, label, short_label, tool_url, icon, sort_order )
+            )
+          `)
+          .eq('facilitator_id', profile.id)
+          .eq('active', true),
+        supabase
+          .from('instructor_resources')
+          .select('*')
+          .eq('active', true)
+          .order('sort_order'),
+      ])
+      if (cf) setMyCourses(cf)
+      if (ir) setResources(ir)
       setLoading(false)
     }
     load()
@@ -150,23 +159,46 @@ export default function InstructorTools() {
 
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Teaching resources</div>
-            <div className={styles.stdGrid}>
-              {[
-                { icon:'📋', title:'Bible Study Guide',      desc:'Structured templates for weekly facilitation.',           bg:'var(--grey-bg)'  },
-                { icon:'🏛️', title:'Foundation Class Guide', desc:'Curriculum support for new members class.',               bg:'var(--blue-l)'   },
-                { icon:'🎯', title:'Teaching Mechanism',     desc:'AI slide builder — paste notes, get a live presentation.',bg:'var(--grey-bg)'  },
-                { icon:'📤', title:'Share Content',          desc:'Send a resource or announcement to your email list.',     bg:'var(--orange-l)', orange:true },
-              ].map((t,i) => (
-                <div key={i} className={styles.stdCard}>
-                  <div className={styles.stdIcon} style={{ background:t.bg }}>{t.icon}</div>
-                  <div className={styles.stdTitle}>{t.title}</div>
-                  <div className={styles.stdDesc}>{t.desc}</div>
-                  <div className={styles.stdCta} style={{ color: t.orange ? 'var(--orange)' : 'var(--blue)' }}>
-                    {t.orange ? 'Share now →' : 'Open →'}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {resources.length === 0 ? (
+              <div className={styles.empty}>No resources added yet.</div>
+            ) : (
+              <div className={styles.stdGrid}>
+                {resources.map((r) => {
+                  const hasLink = r.url && r.url.trim().length > 0
+                  const cta = r.cta_label || (hasLink ? 'Open' : 'Coming soon')
+                  const isOrange = (r.icon_bg || '').includes('orange')
+                  const ctaColor = !hasLink
+                    ? 'var(--grey-mid)'
+                    : isOrange ? 'var(--orange)' : 'var(--blue)'
+                  const cardProps = hasLink
+                    ? {
+                        as: 'a',
+                        href: r.url.trim(),
+                        target: r.open_in_new_tab ? '_blank' : '_self',
+                        rel: 'noreferrer',
+                      }
+                    : {}
+                  const Tag = hasLink ? 'a' : 'div'
+                  return (
+                    <Tag
+                      key={r.id}
+                      className={styles.stdCard}
+                      href={hasLink ? r.url.trim() : undefined}
+                      target={hasLink ? (r.open_in_new_tab ? '_blank' : '_self') : undefined}
+                      rel={hasLink ? 'noreferrer' : undefined}
+                      style={hasLink ? { textDecoration: 'none', color: 'inherit' } : undefined}
+                    >
+                      <div className={styles.stdIcon} style={{ background: r.icon_bg }}>{r.icon}</div>
+                      <div className={styles.stdTitle}>{r.title}</div>
+                      <div className={styles.stdDesc}>{r.description}</div>
+                      <div className={styles.stdCta} style={{ color: ctaColor }}>
+                        {cta}{hasLink ? ' →' : ''}
+                      </div>
+                    </Tag>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
